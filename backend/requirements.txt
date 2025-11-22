@@ -2,3 +2,9 @@ fastapi
 sqlalchemy
 uvicorn
 fish-audio-sdk
+authlib
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+pydantic[email]
+python-dotenv

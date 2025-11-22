@@ -1,18 +1,48 @@
-from typing import Union
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from database import engine, Base
+from routers import auth
 
-app = FastAPI()
+# Create database tables
+Base.metadata.create_all(bind=engine)
 
-origins = ['http://localhost:8000']
-app.add_middleware(
-    CORSMiddleware, 
-    allow_origins = origins,
-    allow_credentials = True,
-    allow_methods = ["*"],
-    allow_headers = ["*"]
+app = FastAPI(
+    title="Language Conversation API",
+    description="API with Google OAuth authentication",
+    version="1.0.0"
 )
 
-@app.get("/test")
+# CORS configuration
+origins = [
+    'http://localhost:3000',
+    'http://localhost:8000',
+    'http://localhost:5173',
+    'http://localhost:5174',
+]
+
+app.add_middleware(
+    CORSMiddleware, 
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"]
+)
+
+# Include routers
+app.include_router(auth.router)
+
+@app.get("/")
 async def root():
+    return {
+        "message": "Language Conversation API",
+        "docs": "/docs",
+        "auth": {
+            "login": "/auth/login",
+            "callback": "/auth/callback",
+            "me": "/auth/me"
+        }
+    }
+
+@app.get("/test")
+async def test():
     return {"message": "hello world"}
