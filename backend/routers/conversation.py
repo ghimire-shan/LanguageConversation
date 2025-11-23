@@ -1,12 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request
-import deepgram
-from google import genai
+from fastapi import APIRouter, Depends, HTTPException, status, Request, UploadFile, File, Form
 import json
-import os
-from config import settings
-from practice import deepgram, genai, fish_audio, transcribe_audio, generate_speech
-from schemas.tts import TTSRequest
 import base64
+from routers.practice import transcribe_audio, generate_speech
+from schemas.tts import TTSRequest
 
 router = APIRouter(prefix="/api", tags=['api'])
 
@@ -14,7 +10,11 @@ async def get_reply(text, language):
     pass
 
 @router.post('/reply')
-async def conversation_reply(file, target_lang, model_id):
+async def conversation_reply(
+    file: UploadFile = File(...),
+    target_lang: str = Form(...),
+    model_id: str = Form(...)
+):
     try:
         audio_data = await file.read()
 
@@ -23,7 +23,8 @@ async def conversation_reply(file, target_lang, model_id):
 
         # Step 1 is to transcribe with deepgram
         transcription = await transcribe_audio(audio_data, target_lang)
-
+        print(transcription)
+        
         if not transcription['text'].strip():
             raise HTTPException(status_code=400, detail="No speech was detected")
 

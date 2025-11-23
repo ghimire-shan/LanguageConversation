@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from database import engine, Base
-from routers import auth, practice, voice_clone
+from routers import auth, practice, voice_clone, conversation
 
 # Create database tables
 Base.metadata.create_all(bind=engine)
@@ -18,6 +18,8 @@ origins = [
     'http://localhost:8000',
     'http://localhost:5173',
     'http://localhost:5174',
+    'http://localhost:5500',
+    'http://127.0.0.1:5500',
 ]
 
 app.add_middleware(
@@ -32,6 +34,7 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(practice.router)
 app.include_router(voice_clone.router)
+app.include_router(conversation.router)
 
 @app.get("/")
 async def root():

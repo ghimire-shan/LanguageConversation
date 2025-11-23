@@ -22,7 +22,7 @@ from schemas import tts
         Return audio stream to user
 """
 
-deepgram = DeepgramClient(api_key=settings.DEEPGRAM_ENV_KEY)
+
 # FishAudio reads API key from environment variable FISH_API_KEY
 os.environ['FISH_API_KEY'] = settings.FISH_AUDIO_API_KEY
 fish_audio = FishAudio()
@@ -30,19 +30,39 @@ fish_audio = FishAudio()
 router = APIRouter(prefix="/api", tags=['api'])
 
 async def transcribe_audio(audio_data: bytes, target_language: str='en'):
+    # Validate API key
+    api_key = settings.DEEPGRAM_API_KEY
+    if not api_key or not api_key.strip():
+        raise HTTPException(
+            status_code=500,
+            detail="DEEPGRAM_ENV_KEY is not set or is empty. Please check your .env file."
+        )
+    
+    # Ensure no extra whitespace
+    api_key = api_key.strip()
+    
+    try:
+        deepgram = DeepgramClient(api_key=api_key)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to initialize Deepgram client: {str(e)}"
+        )
+    
     try:
         # v3 uses different way to send requests, matching that 
         response = deepgram.listen.v1.media.transcribe_file(
-            request= audio_data, 
-            model= 'nova-2',
+            request=audio_data, 
+            model='nova-2',
             smart_format=True,
             language=target_language if target_language != "auto" else "en",
             detect_language=True if target_language == "auto" else False,
             punctuate=True,
         )
         
-        transcript = response['results']['channels'][0]['alternatives'][0]['transcript']
-        confidence = response['results']['channels'][0]['alternatives'][0]['confidence']
+        # Access response as object attributes (v3+ SDK style)
+        transcript = response.results.channels[0].alternatives[0].transcript
+        confidence = response.results.channels[0].alternatives[0].confidence
 
         # Handle language detection
         if target_language == "auto" and hasattr(response.results.channels[0], 'detected_language'):
