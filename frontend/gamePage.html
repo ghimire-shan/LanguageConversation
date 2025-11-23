@@ -772,10 +772,12 @@
                 <p
                   class="text-base font-bold text-rose-900 leading-relaxed italic px-4"
                 >
-                  "The quick brown fox jumps over the lazy dog. She sells
-                  seashells by the seashore. I speak with a natural, relaxed
-                  tone, giving clear vowels and consonants. This example
-                  recording should help build an accurate voice model."
+                  "Hello, my name is Alex, and I enjoy reading books about
+                  technology and science. Yesterday, I walked through the park,
+                  observing the beautiful autumn leaves. The weather was quite
+                  pleasant, with a gentle breeze and warm sunshine. I often
+                  think about how amazing our world is, full of interesting
+                  discoveries waiting to be made."
                 </p>
                 <p class="text-sm text-slate-500 mt-4 font-medium">
                   (Please talk for about 15 seconds)
@@ -1323,8 +1325,8 @@
             console.log("Clone created:", result);
 
             // Store the model ID if returned
-            if (result.model_id) {
-              localStorage.setItem("user_voice_model_id", result.model_id);
+            if (result.voice_id) {
+              localStorage.setItem("user_voice_model_id", result.voice_id);
             }
 
             alert(`Voice clone "${voiceName}" created successfully!`);
