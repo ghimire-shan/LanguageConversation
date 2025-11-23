@@ -1,0 +1,19 @@
+{
+  "preset_voices": {
+    "energetic_male": {
+      "id": "03397b4c4be74759b72533b663fbd001",
+      "name": "Energetic Male",
+      "description": "A lively and energetic male voice"
+    },
+    "adam": {
+      "id": "728f6ff2240d49308e8137ffe66008e2",
+      "name": "Adam",
+      "description": "Adam voice preset"
+    },
+    "bro": {
+      "id": "e0e2468ce2d746c1b20a4414435f6f48",
+      "name": "Bro",
+      "description": "Bro voice preset"
+    }
+  }
+}
