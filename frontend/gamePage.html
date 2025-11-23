@@ -319,6 +319,19 @@
         gap: 0.5rem;
         border: 1px solid var(--border-light);
       }
+      .typing-cursor {
+  width: 2px;
+  height: 18px;
+  background-color: var(--accent-teal);
+  margin: 0.5rem auto 0;
+  border-radius: 999px;
+  animation: blinkCursor 1s steps(2, start) infinite;
+}
+
+@keyframes blinkCursor {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
       .nav-button {
         padding: 0.75rem 1rem;
         border-radius: 100px;
@@ -515,21 +528,19 @@
             </div>
 
             <div class="flex-1 flex flex-col overflow-hidden">
-              <div class="transcript-box mb-0">
-                <span
-                  class="text-xs font-bold text-slate-500 tracking-wider mb-4 block"
-                  >SESSION</span
-                >
-                <div
-                  id="practice-chat-history"
-                  class="flex-1 overflow-y-auto flex flex-col gap-3"
-                  style="max-height: 100%"
-                >
-                  <p class="text-slate-400 italic text-center px-8">
-                    Messages here...
-                  </p>
-                </div>
-              </div>
+            <div
+    id="practice-chat-history"
+    class="flex-1 overflow-y-auto flex flex-col gap-3"
+    style="max-height: 100%"
+  >
+    <p class="text-slate-400 italic text-center px-8">
+      Messages here...
+    </p>
+
+    <!-- Typing cursor for practice mode (backend can toggle .hidden) -->
+    <div id="practice-typing-cursor" class="typing-cursor hidden"></div>
+  </div>
+
             </div>
           </section>
         </div>
@@ -739,9 +750,11 @@
       Sample script
     </p>
     <p class="text-sm text-rose-900 leading-relaxed px-2">
-      “Hello, my name is Alex. I enjoy reading books about technology and
-      science. Yesterday I walked through the park, watching the autumn leaves
-      and warm sunshine.”
+      "Hello, my name is Alex, and I enjoy reading books about technology 
+and science. Yesterday, I walked through the park, observing the 
+beautiful autumn leaves. The weather was quite pleasant, with a 
+gentle breeze and warm sunshine. I often think about how amazing 
+our world is, full of interesting discoveries waiting to be made."
     </p>
     <p class="text-[11px] text-slate-500 mt-2">
       Aim for about 10–15 seconds of clear audio.
