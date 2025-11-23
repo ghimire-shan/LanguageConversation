@@ -5,8 +5,11 @@ from config import settings
 from database import get_db
 from models.user import User
 from auth import get_current_user
+import os
 
-fish_audio = FishAudio(settings.FISH_AUDIO_API_KEY)
+# FishAudio reads API key from environment variable FISH_API_KEY
+os.environ['FISH_API_KEY'] = settings.FISH_AUDIO_API_KEY
+fish_audio = FishAudio()
 router = APIRouter(prefix="/api", tags=['api'])
 
 @router.post("/create_clone")

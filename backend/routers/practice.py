@@ -1,14 +1,16 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.responses import Response
 from deepgram import DeepgramClient
-from google import genai
+import google.genai as genai
 import json
 import base64
+import os
 
 from fishaudio import FishAudio
 from schemas.tts import TTSRequest
 from config import settings
 from schemas import tts
+from utils.preset_voices import is_preset_voice, get_all_preset_voices
 
 """
     The routes for the practice gets a audio stream, language, and voice to use
@@ -21,26 +23,74 @@ from schemas import tts
         Return audio stream to user
 """
 
-deepgram = DeepgramClient(settings.DEEPGRAM_ENV_KEY)
-genai.configure(apk_key = settings.GEMINI_APK_KEY)
-fish_audio = FishAudio(settings.FISH_AUDIO_API_KEY)
+
+# FishAudio reads API key from environment variable FISH_API_KEY
+os.environ['FISH_API_KEY'] = settings.FISH_AUDIO_API_KEY
+fish_audio = FishAudio()
 
 router = APIRouter(prefix="/api", tags=['api'])
 
+@router.get("/preset-voices")
+async def get_preset_voices():
+    """
+    Get all available preset voices that users can choose from.
+    Returns a list of preset voices with their IDs, names, and descriptions.
+    """
+    try:
+        presets = get_all_preset_voices()
+        # Convert to list format for easier frontend consumption
+        voices_list = []
+        for key, voice_data in presets.items():
+            voices_list.append({
+                "key": key,
+                "id": voice_data.get("id"),
+                "name": voice_data.get("name"),
+                "description": voice_data.get("description", "")
+            })
+        return {
+            "success": True,
+            "preset_voices": voices_list
+        }
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error loading preset voices: {str(e)}"
+        )
+
 async def transcribe_audio(audio_data: bytes, target_language: str='en'):
+    # Validate API key
+    api_key = settings.DEEPGRAM_API_KEY
+    if not api_key or not api_key.strip():
+        raise HTTPException(
+            status_code=500,
+            detail="DEEPGRAM_ENV_KEY is not set or is empty. Please check your .env file."
+        )
+    
+    # Ensure no extra whitespace
+    api_key = api_key.strip()
+    
+    try:
+        deepgram = DeepgramClient(api_key=api_key)
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to initialize Deepgram client: {str(e)}"
+        )
+    
     try:
         # v3 uses different way to send requests, matching that 
         response = deepgram.listen.v1.media.transcribe_file(
-            request= audio_data, 
-            model= 'nova-2',
+            request=audio_data, 
+            model='nova-2',
             smart_format=True,
             language=target_language if target_language != "auto" else "en",
             detect_language=True if target_language == "auto" else False,
             punctuate=True,
         )
         
-        transcript = response['results']['channels'][0]['alternatives'][0]['transcript']
-        confidence = response['results']['channels'][0]['alternatives'][0]['confidence']
+        # Access response as object attributes (v3+ SDK style)
+        transcript = response.results.channels[0].alternatives[0].transcript
+        confidence = response.results.channels[0].alternatives[0].confidence
 
         # Handle language detection
         if target_language == "auto" and hasattr(response.results.channels[0], 'detected_language'):
@@ -125,15 +175,15 @@ async def practice_speech(file, target_lang, model_id):
         corrected_text = correction['corrected_text']
 
         # Step 3 is to send it to Fish audio for it to be made into the sound of someone
-        request = tts.TTSRequest(transcript= corrected_text, model_id = model_id )
-        correction_audio = await generate_speech(request= request)
+        request = tts.TTSRequest(transcript=corrected_text, model_id=model_id)
+        correction_audio = await generate_speech(request=request)
 
         # Convert the audio to base64 for easy frontend handling
-        audio_base64 = base64.b64decode(correction_audio).decode('utf-8')
+        audio_base64 = base64.b64encode(correction_audio).decode('utf-8')
 
         return {
             "success": True,
-            "corrected_text": corrected_text['corrected_text'],
+            "corrected_text": corrected_text,
             "audio_base64": audio_base64,
             "audio_format": "wav",
         }
@@ -146,9 +196,13 @@ async def practice_speech(file, target_lang, model_id):
 
 async def generate_speech(request: TTSRequest):
     """
-    Generate speech from text using a Fish Audio cloned voice model.
+    Generate speech from text using a Fish Audio voice model.
     
-    Takes a transcript and model_id (your cloned voice model ID), returns audio file.
+    Takes a transcript and model_id. The model_id can be:
+    - A user's cloned voice model ID (from their account)
+    - A preset voice ID (from preset_voices.json)
+    
+    Returns audio file as bytes.
     """
     try:
         # Validate input
@@ -164,7 +218,10 @@ async def generate_speech(request: TTSRequest):
                 detail="Model ID cannot be empty"
             )
         
-        # Generate speech using the cloned voice model
+        # Check if it's a preset voice (for logging/debugging)
+        is_preset = is_preset_voice(request.model_id)
+        
+        # Generate speech using the voice model (works for both preset and user voices)
         audio = fish_audio.tts.convert(
             text=request.transcript,
             reference_id=request.model_id,

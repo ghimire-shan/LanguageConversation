@@ -337,7 +337,10 @@
                     <div class="w-full max-w-lg flex flex-col gap-8 items-center">
                          <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 w-full shadow-sm text-center">
                             <p class="text-sm font-bold text-slate-500 mb-3 uppercase tracking-wider">Instructions:</p>
-                            <p class="text-base font-bold text-rose-900 leading-relaxed italic px-4">"This is a sample recording to capture the unique tone and characteristics of my voice for AI cloning. To get the best results, it is important to speak clearly and naturally, just as I would in a normal conversation with a friend. I am trying to maintain a steady pace throughout this entire paragraph."</p>
+                            <p class="text-base font-bold text-rose-900 leading-relaxed italic px-4">"The quick brown fox jumps over the lazy dog.
+                                She sells seashells by the seashore.
+                                I speak with a natural, relaxed tone, giving clear vowels and consonants.
+                                This example recording should help build an accurate voice model."</p>
                             <p class="text-sm text-slate-500 mt-4 font-medium">(Please talk for about 15 seconds)</p>
                          </div>
                         
@@ -371,24 +374,24 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            // ================= CONFETTI LOGIC =================
-            const confettiContainer = document.getElementById('confetti-container');
-            const colors = ['#3B82F6', '#14B8A6', '#10B981', '#60A5FA', '#CBD5E1'];
-            const numConfetti = 60; 
+    // ================= CONFETTI LOGIC =================
+    const confettiContainer = document.getElementById('confetti-container');
+    const colors = ['#3B82F6', '#14B8A6', '#10B981', '#60A5FA', '#CBD5E1'];
+    const numConfetti = 60; 
 
-            for (let i = 0; i < numConfetti; i++) {
-                const confetti = document.createElement('div');
-                confetti.classList.add('confetti-piece');
-                confetti.style.left = Math.random() * 100 + 'vw';
-                confetti.style.top = Math.random() * 100 + 'vh';
-                confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-                const size = Math.random() * 6 + 4; 
-                confetti.style.width = size + 'px';
-                confetti.style.height = (Math.random() > 0.5 ? size : size * 1.5) + 'px';
-                confetti.style.opacity = Math.random() * 0.3 + 0.1; 
-                confettiContainer.appendChild(confetti);
-            }
+    for (let i = 0; i < numConfetti; i++) {
+        const confetti = document.createElement('div');
+        confetti.classList.add('confetti-piece');
+        confetti.style.left = Math.random() * 100 + 'vw';
+        confetti.style.top = Math.random() * 100 + 'vh';
+        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        const size = Math.random() * 6 + 4; 
+        confetti.style.width = size + 'px';
+        confetti.style.height = (Math.random() > 0.5 ? size : size * 1.5) + 'px';
+        confetti.style.opacity = Math.random() * 0.3 + 0.1; 
+        confettiContainer.appendChild(confetti);
+    }
 
             // ================= NAVIGATION LOGIC =================
             const navConvBtn = document.getElementById('nav-conv-btn');
@@ -618,6 +621,321 @@
             // Initialize Practice Mode UI on load
             updateConvLanguageUI();
         });
-    </script>
+        [conversationView, practiceView, cloneView].forEach(view => {
+            view.classList.remove('active-view');
+            view.classList.add('hidden-view');
+        });
+        document.body.classList.remove('mode-conversation', 'mode-practice', 'mode-clone');
+
+    navConvBtn.addEventListener('click', () => {
+        resetViews();
+        document.body.classList.add('mode-conversation');
+        navConvBtn.classList.add('active'); navConvBtn.classList.remove('inactive');
+        conversationView.classList.add('active-view'); conversationView.classList.remove('hidden-view');
+    });
+
+    navPracBtn.addEventListener('click', () => {
+        resetViews();
+        document.body.classList.add('mode-practice');
+        navPracBtn.classList.add('active'); navPracBtn.classList.remove('inactive');
+        practiceView.classList.add('active-view'); practiceView.classList.remove('hidden-view');
+    });
+
+    navCloneBtn.addEventListener('click', () => {
+        resetViews();
+        document.body.classList.add('mode-clone');
+        navCloneBtn.classList.add('active'); navCloneBtn.classList.remove('inactive');
+        cloneView.classList.add('active-view'); cloneView.classList.remove('hidden-view');
+    });
+
+    // ================= PRACTICE MODE LOGIC =================
+    const practiceVoiceSelect = document.getElementById('practice-voice-select');
+    const selectedVoiceDisplay = document.getElementById('selected-voice-display');
+    const practiceInputState = document.getElementById('practice-input-state');
+    const practiceResultsState = document.getElementById('practice-results-state');
+    const pracMicBtn = document.getElementById('prac-mic-btn');
+    const pracResetBtn = document.getElementById('prac-reset-btn');
+
+    // Update dropdown display on change
+    practiceVoiceSelect.addEventListener('change', function() {
+        const selectedText = this.options[this.selectedIndex].text;
+        let iconClass = 'ph-user';
+        if (this.value === 'trump' || this.value === 'biden') iconClass = 'ph-user-focus';
+        if (this.value === 'ronaldo') iconClass = 'ph-soccer-ball';
+        if (this.value === 'spongebob') iconClass = 'ph-smiley';
+        selectedVoiceDisplay.innerHTML = `<i class="ph-fill ${iconClass}"></i> ${selectedText}`;
+    });
+
+    // Simulate Practice Session on Mic Click (still just mock UI)
+    pracMicBtn.addEventListener('click', () => {
+        pracMicBtn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-3xl"></i><div class="text-left"><span class="block font-bold text-2xl">Connecting...</span><span class="block text-sm opacity-80 tracking-wider">Please wait</span></div>';
+        setTimeout(() => {
+            practiceInputState.classList.add('hidden');
+            practiceResultsState.classList.remove('hidden');
+            pracMicBtn.innerHTML = '<i id="prac-mic-icon" class="ph-fill ph-chats-circle text-3xl transition-all"></i><div class="text-left"><span class="block font-bold text-2xl">Start Talking with AI</span><span class="block text-sm opacity-80 tracking-wider">Tap to begin session</span></div>';
+        }, 1500);
+    });
+
+    // Reset back to input state
+    pracResetBtn.addEventListener('click', () => {
+        practiceResultsState.classList.add('hidden');
+        practiceInputState.classList.remove('hidden');
+    });
+
+    // ================= CLONE MODE LOGIC =================
+    // (no backend here yet; just UI — keep as-is if you add later)
+
+    // ================= CONVERSATION MODE LOGIC =================
+    const convMicBtn = document.getElementById('conv-mic-btn');
+    const convMicIcon = document.getElementById('conv-mic-icon');
+    const convMicText = document.getElementById('conv-mic-text');
+    const convMicSubtext = document.getElementById('conv-mic-subtext');
+    const convVoiceBars = document.getElementById('conv-voice-bars');
+    const convClearBtn = document.getElementById('conv-clear-btn');
+    const historySource = document.getElementById('history-source');
+    const historyTarget = document.getElementById('history-target');
+    const convLangSelect = document.getElementById('conv-lang-select');
+    const targetTranslationLabel = document.getElementById('target-translation-label');
+    const targetLangFlag = document.getElementById('target-lang-flag');
+    const targetLangNameSpan = document.getElementById('target-lang-name');
+
+    // Language UI (still just cosmetic)
+    function updateConvLanguageUI() {
+        const selectedLangCode = convLangSelect.value;
+        let flagUrl = "";
+        let langName = "";
+
+        if (selectedLangCode === 'es') {
+            flagUrl = "https://flagicons.lipis.dev/flags/4x3/es.svg";
+            langName = "Spanish";
+        } else if (selectedLangCode === 'fr') {
+            flagUrl = "https://flagicons.lipis.dev/flags/4x3/fr.svg";
+            langName = "French";
+        }
+        
+        targetLangFlag.src = flagUrl;
+        targetLangFlag.alt = `${langName} Flag`;
+        targetLangNameSpan.textContent = langName;
+        targetTranslationLabel.textContent = `CORRECT (${langName.toUpperCase()})`;
+    }
+
+    convLangSelect.addEventListener('change', updateConvLanguageUI);
+
+    // Helpers for base64 audio → playable URL
+    function base64ToBlob(base64) {
+        const cleaned = base64.trim();
+        // If the backend already sends a data URL, just skip
+        if (cleaned.startsWith('data:audio')) {
+            // We'll use this string directly as src
+            return cleaned;
+        }
+        const binary = atob(cleaned);
+        const len = binary.length;
+        const bytes = new Uint8Array(len);
+        for (let i = 0; i < len; i++) {
+            bytes[i] = binary.charCodeAt(i);
+        }
+        const blob = new Blob([bytes]); // no explicit type so browser sniffs it
+        return URL.createObjectURL(blob);
+    }
+
+    let currentAudio = null;
+
+    function createPlayButton(onClick, extraClasses = '') {
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = `tactile-touch flex items-center gap-2 px-3 py-1.5 rounded-full font-bold text-xs ${extraClasses}`;
+        btn.innerHTML = '<i class="ph-bold ph-play"></i> Play';
+        btn.addEventListener('click', () => {
+            if (currentAudio) {
+                currentAudio.pause();
+                currentAudio.currentTime = 0;
+            }
+            onClick();
+        });
+        return btn;
+    }
+
+    function updateConversationHistory(response) {
+        if (!response) return;
+
+        const {
+            original_text,
+            original_audio,   // base64 (or data URL) for what user said
+            corrected_text,
+            audio_base64      // base64 (or data URL) for corrected TTS
+        } = response;
+
+        // Clear placeholders / previous text
+        historySource.innerHTML = '';
+        historyTarget.innerHTML = '';
+
+        // ---- "YOU SAID" BOX ----
+        const sourceWrapper = document.createElement('div');
+        sourceWrapper.className = 'flex flex-col items-center gap-2';
+
+        const sourceTextEl = document.createElement('p');
+        sourceTextEl.className = 'text-slate-700 font-bold bg-white p-3 rounded-xl shadow-sm border border-slate-100 text-center';
+        sourceTextEl.textContent = original_text || '(No transcription received)';
+        sourceWrapper.appendChild(sourceTextEl);
+
+        if (original_audio) {
+            const srcUrl = base64ToBlob(original_audio);
+            const playBtn = createPlayButton(() => {
+                currentAudio = new Audio(srcUrl);
+                currentAudio.play();
+            }, 'bg-slate-100 hover:bg-slate-200 text-slate-600');
+            sourceWrapper.appendChild(playBtn);
+        }
+
+        historySource.appendChild(sourceWrapper);
+
+        // ---- "CORRECT (LANG)" BOX ----
+        const targetWrapper = document.createElement('div');
+        targetWrapper.className = 'flex flex-col items-center gap-2';
+
+        const targetTextEl = document.createElement('p');
+        targetTextEl.className = 'translation-bubble text-center';
+        targetTextEl.textContent = corrected_text || '(No correction received)';
+        targetWrapper.appendChild(targetTextEl);
+
+        if (audio_base64) {
+            const tgtUrl = base64ToBlob(audio_base64);
+            const listenBtn = createPlayButton(() => {
+                currentAudio = new Audio(tgtUrl);
+                currentAudio.play();
+            }, 'bg-emerald-100 hover:bg-emerald-200 text-emerald-800 mt-1');
+            listenBtn.innerHTML = '<i class="ph-bold ph-speaker-high"></i> Listen';
+            targetWrapper.appendChild(listenBtn);
+        }
+
+        historyTarget.appendChild(targetWrapper);
+    }
+
+    // ========== Backend Upload Function ==========
+    async function uploadAudioToBackend(audioBlob) {
+        console.log("Uploading blob:", audioBlob);
+
+        try {
+            const formData = new FormData();
+            formData.append("file", audioBlob, "audio.webm");
+
+            formData.append("target_lang", "es");  // or whatever lang selector value
+
+        // required by: model_id: str = Form(...)
+            formData.append("model_id", "54e3a85ac9594ffa83264b8a494b901b");
+
+            // optional: chat_history: str = Form(None)
+            const chatHistory = { User: "hello", Assistant: "try thos" };
+            formData.append("chat_history", JSON.stringify(chatHistory));
+
+            const response = await fetch("http://localhost:8000/api/reply", {
+                method: "POST",
+                body: formData
+
+            });
+
+            if (!response.ok) {
+                console.error("Server returned non-OK status:", response.status);
+                return;
+            }
+
+            const result = await response.json();
+            console.log("Server responded:", result);
+
+            // ⬇️ Put the real texts & audios into the UI
+            updateConversationHistory(result);
+
+        } catch (err) {
+            console.error("Upload failed:", err);
+        }
+    }
+
+    // ========== MIC RECORDING / TOGGLE ==========
+    let convMediaRecorder = null;
+    let convAudioChunks = [];
+    let convStream = null;
+    let isConvMicActive = false;
+
+    async function handleConvMicToggle() {
+        console.log("Mic clicked");
+        isConvMicActive = !isConvMicActive;
+
+        if (isConvMicActive) {
+            console.log("Starting recording...");
+
+            try {
+                convStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+
+                convAudioChunks = [];
+                convMediaRecorder = new MediaRecorder(convStream, {
+                    mimeType: "audio/webm"
+                });
+
+                convMediaRecorder.ondataavailable = e => convAudioChunks.push(e.data);
+
+                convMediaRecorder.start();
+
+                // UI updates
+                convMicBtn.classList.add('active-state');
+                convMicIcon.classList.remove('ph-microphone');
+                convMicIcon.classList.add('ph-waveform', 'animate-pulse');
+                convMicText.textContent = "Listening...";
+                convMicSubtext.textContent = "Speak clearly";
+                convVoiceBars.classList.add('animate-voice');
+
+            } catch (err) {
+                console.error("MIC ERROR:", err);
+                alert("Microphone blocked. Check browser permissions.");
+                isConvMicActive = false;
+            }
+
+        } else {
+            console.log("Stopping recording...");
+
+            if (!convMediaRecorder) {
+                return;
+            }
+
+            convMediaRecorder.stop();
+
+            convMediaRecorder.onstop = async () => {
+                console.log("Recorder stopped");
+
+                const audioBlob = new Blob(convAudioChunks, { type: "audio/webm" });
+
+                // Stop audio stream
+                if (convStream) {
+                    convStream.getTracks().forEach(t => t.stop());
+                }
+
+                console.log("Final blob:", audioBlob);
+                await uploadAudioToBackend(audioBlob);
+            };
+
+            // UI back to idle
+            convMicBtn.classList.remove('active-state');
+            convMicIcon.classList.remove('ph-waveform', 'animate-pulse');
+            convMicIcon.classList.add('ph-microphone');
+            convMicText.textContent = "Tap to speak";
+            convMicSubtext.textContent = "Tap and talk";
+            convVoiceBars.classList.remove('animate-voice');
+        }
+    }
+
+    convMicBtn.addEventListener('click', handleConvMicToggle);
+
+    convClearBtn.addEventListener('click', () => {
+        historySource.innerHTML = '<p class="text-slate-400 italic text-center px-8">Your speech will appear here...</p>';
+        historyTarget.innerHTML = '<p class="text-green-600/50 italic text-center px-8">...and the correction will appear here.</p>';
+    });
+
+    // Initialize UI on load
+    updateConvLanguageUI();
+    document.body.classList.add('mode-conversation');
+
+</script>
+
+
 </body>
 </html>
