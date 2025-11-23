@@ -439,63 +439,34 @@
             <div
               class="w-full max-w-xs flex flex-col gap-4 items-center relative z-10 mb-2"
             >
-              <!-- DROPDOWN 1: LANGUAGE (KEEPING YOUR FLAG + NAME SETUP) -->
-              <div
-                class="w-full flex items-center justify-center bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm transition-colors hover:border-blue-200 relative"
-              >
-                <select
-                  id="practice-lang-select"
-                  class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-                >
-                    <option value="en">English</option>
-                  <option value="es">Spanish</option>
-                  <option value="fr">French</option>
-                  <option value="de">German</option>
-                  <option value="jp">Japanese</option>
-
-                </select>
-                <div
-                  class="flex items-center gap-2 text-blue-600 pointer-events-none z-10"
-                >
-                  <span class="text-slate-500 font-medium text-sm mr-1"
-                    >Language:</span
-                  >
-                  <img
-                    id="practice-lang-flag"
-                    src="https://flagicons.lipis.dev/flags/4x3/es.svg"
-                    alt="Target Flag"
-                    class="w-5 h-4 object-cover rounded-sm shadow-sm"
-                  />
-                  <span id="practice-lang-name" class="font-bold text-sm"
-                    >Spanish</span
-                  >
-                  <i class="ph-bold ph-caret-down"></i>
-                </div>
-              </div>
-
-              <!-- DROPDOWN 2: MODEL (VARIABLE 1 / VARIABLE 2) -->
-              <div
-                class="w-full bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm transition-colors hover:border-blue-200"
-              >
-                <div class="flex items-center justify-between">
-                  <select
-                    id="practice-model-select"
-                    class="bg-transparent text-sm font-bold text-slate-700 outline-none flex-1 cursor-pointer"
-                  >
-                    <option value="03397b4c4be74759b72533b663fbd001">
-                      Energetic Male
-                    </option>
-                    <option value="728f6ff2240d49308e8137ffe66008e2">
-                      Adam
-                    </option>
-                    <option value="e0e2468ce2d746c1b20a4414435f6f48">
-                      Bro
-                    </option>
-                  </select>
-                  <i class="ph-bold ph-caret-down text-slate-400 ml-2"></i>
-                </div>
-              </div>
-
+             <!-- DROPDOWN 1: LANGUAGE (KEEPING YOUR FLAG + NAME SETUP) -->
+<div
+  class="w-full flex items-center justify-center bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm transition-colors hover:border-blue-200 relative"
+>
+  <select
+    id="practice-lang-select"
+    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+  >
+    <option value="en">English</option>
+    <option value="es">Spanish</option>
+    <option value="fr">French</option>
+    <option value="de">German</option>
+    <option value="jp">Japanese</option>
+  </select>
+  <div
+    class="flex items-center gap-2 text-blue-600 pointer-events-none z-10"
+  >
+    <span class="text-slate-500 font-medium text-sm mr-1">Language:</span>
+    <img
+      id="practice-lang-flag"
+      src="https://flagicons.lipis.dev/flags/4x3/es.svg"
+      alt="Target Flag"
+      class="w-5 h-4 object-cover rounded-sm shadow-sm"
+    />
+    <span id="practice-lang-name" class="font-bold text-sm">Spanish</span>
+    <i class="ph-bold ph-caret-down"></i>
+  </div>
+</div>
               <!-- MIC BUTTON -->
               <button id="practice-mic-btn" class="mic-button group">
                 <i
@@ -623,74 +594,92 @@
             </p>
 
             <div
-              class="w-full max-w-xs flex flex-col gap-4 items-center relative z-10 mb-2"
-            >
-              <!-- LANGUAGE SELECTOR -->
-              <div
-                class="w-full flex items-center justify-center bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm transition-colors hover:border-blue-200 relative"
-              >
-                <select
-                  id="conversation-lang-select"
-                  class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-                >
-                <option value="en">English</option>
-                <option value="es">Spanish</option>
-                <option value="fr">French</option>
-                <option value="de">German</option>
-                <option value="jp">Japanese</option>
-                </select>
-                <div
-                  class="flex items-center gap-2 text-blue-600 pointer-events-none z-10"
-                >
-                  <span class="text-slate-500 font-medium text-sm mr-1"
-                    >Talk in:</span
-                  >
-                  <img
-                    id="conversation-lang-flag"
-                    src="https://flagicons.lipis.dev/flags/4x3/es.svg"
-                    alt="Target Flag"
-                    class="w-5 h-4 object-cover rounded-sm shadow-sm"
-                  />
-                  <span id="conversation-lang-name" class="font-bold text-sm"
-                    >Spanish</span
-                  >
-                  <i class="ph-bold ph-caret-down"></i>
-                </div>
-              </div>
+  class="w-full max-w-xs flex flex-col gap-4 items-center relative z-10 mb-2"
+>
+  <!-- LANGUAGE SELECTOR -->
+  <div
+    class="w-full flex items-center justify-center bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm transition-colors hover:border-blue-200 relative"
+  >
+    <select
+      id="conversation-lang-select"
+      class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+    >
+      <option value="en">English</option>
+      <option value="es">Spanish</option>
+      <option value="fr">French</option>
+      <option value="de">German</option>
+      <option value="jp">Japanese</option>
+    </select>
+    <div
+      class="flex items-center gap-2 text-blue-600 pointer-events-none z-10"
+    >
+      <span class="text-slate-500 font-medium text-sm mr-1">Talk in:</span>
+      <img
+        id="conversation-lang-flag"
+        src="https://flagicons.lipis.dev/flags/4x3/es.svg"
+        alt="Target Flag"
+        class="w-5 h-4 object-cover rounded-sm shadow-sm"
+      />
+      <span id="conversation-lang-name" class="font-bold text-sm"
+        >Spanish</span
+      >
+      <i class="ph-bold ph-caret-down"></i>
+    </div>
+  </div>
 
-              <!-- MIC BUTTON -->
-              <button id="conversation-mic-btn" class="mic-button group">
-                <i
-                  id="conversation-mic-icon"
-                  class="ph-fill ph-microphone text-2xl transition-all"
-                ></i>
-                <div class="text-left">
-                  <span
-                    id="conversation-mic-text"
-                    class="block font-bold text-lg"
-                    >Tap to speak</span
-                  >
-                  <span
-                    id="conversation-mic-subtext"
-                    class="block text-xs opacity-70"
-                    >Ready</span
-                  >
-                </div>
-              </button>
+  <!-- MODEL SELECT (MOVED FROM PRACTICE MODE) -->
+  <div
+    class="w-full bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm transition-colors hover:border-blue-200"
+  >
+    <div class="flex items-center justify-between">
+      <select
+        id="conversation-model-select"
+        class="bg-transparent text-sm font-bold text-slate-700 outline-none flex-1 cursor-pointer"
+      >
+        <option value="03397b4c4be74759b72533b663fbd001">
+          Energetic Male
+        </option>
+        <option value="728f6ff2240d49308e8137ffe66008e2">
+          Adam
+        </option>
+        <option value="e0e2468ce2d746c1b20a4414435f6f48">
+          Bro
+        </option>
+      </select>
+      <i class="ph-bold ph-caret-down text-slate-400 ml-2"></i>
+    </div>
+  </div>
 
-              <!-- VOICE BARS -->
-              <div
-                id="conversation-voice-bars"
-                class="mt-2 h-10 flex items-center justify-center gap-1.5"
-              >
-                <div class="voice-bar"></div>
-                <div class="voice-bar"></div>
-                <div class="voice-bar"></div>
-                <div class="voice-bar"></div>
-                <div class="voice-bar"></div>
-              </div>
-            </div>
-          </section>
+  <!-- MIC BUTTON -->
+  <button id="conversation-mic-btn" class="mic-button group">
+    <i
+      id="conversation-mic-icon"
+      class="ph-fill ph-microphone text-2xl transition-all"
+    ></i>
+    <div class="text-left">
+      <span id="conversation-mic-text" class="block font-bold text-lg"
+        >Tap to speak</span
+      >
+      <span
+        id="conversation-mic-subtext"
+        class="block text-xs opacity-70"
+        >Ready</span
+      >
+    </div>
+  </button>
+
+  <!-- VOICE BARS -->
+  <div
+    id="conversation-voice-bars"
+    class="mt-2 h-10 flex items-center justify-center gap-1.5"
+  >
+    <div class="voice-bar"></div>
+    <div class="voice-bar"></div>
+    <div class="voice-bar"></div>
+    <div class="voice-bar"></div>
+    <div class="voice-bar"></div>
+  </div>
+</div>
 
           <!-- RIGHT CARD: Conversation Chat -->
           <section class="app-card md:max-h-[80vh]">
@@ -1445,6 +1434,9 @@
         const conversationChatContainer = document.getElementById(
           "conversation-chat-container"
         );
+        const conversationModelSelect = document.getElementById(
+          "conversation-model-select"
+        );
 
         // Language UI for conversation mode
         function updateConversationLanguageUI() {
@@ -1622,13 +1614,20 @@
             formData.append("file", audioBlob, "audio.webm");
 
             // Get target language and model ID
-            const targetLang = conversationLangSelect.value;
-            const modelId =
-              localStorage.getItem("user_voice_model_id") ||
-              "03397b4c4be74759b72533b663fbd001";
+            // Get target language and model ID
+const targetLang = conversationLangSelect.value;
 
-            formData.append("target_lang", targetLang);
-            formData.append("model_id", modelId);
+let modelId = localStorage.getItem("user_voice_model_id");
+if (!modelId && conversationModelSelect) {
+  modelId = conversationModelSelect.value;
+}
+if (!modelId) {
+  modelId = "03397b4c4be74759b72533b663fbd001";
+}
+
+formData.append("target_lang", targetLang);
+formData.append("model_id", modelId);
+
 
             // Get and send chat history
             const chatHistory = getConversationHistory();
