@@ -1,6 +1,8 @@
 import os
 from pathlib import Path
 from typing import Optional
+from deepgram import DeepgramClient, PrerecordedOptions, FileSource
+import google.genai as genai
 
 # Try to load .env file if python-dotenv is available
 try:
@@ -28,6 +30,10 @@ class Settings:
     
     # Server Configuration
     SERVER_URL: str = os.getenv("SERVER_URL", "http://localhost:8000")
+
+    # Get keys for the models to run
+    DEEPGRAM_ENV_KEY = os.getenv("DEEPGRAM_ENV_KEY", "")
+    GEMINI_APK_KEY = os.getenv("GEMINI_APK_KEY", "")
 
 settings = Settings()
 
