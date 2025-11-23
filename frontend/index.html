@@ -1,13 +1,168 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.jsx"></script>
-  </body>
+<!DOCTYPE html>
+<html lang="en" class="font-sans text-slate-800 antialiased h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Language App Final Corrected</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body class="h-screen overflow-hidden flex flex-col bg-[#f8fafc]">
+
+    <div class=" bg-slate-50 fixed inset-0 -z-20"></div>
+    <div class="mesh-background opacity-40">
+        <div class="mesh-orb mesh-1"></div>
+        <div class="mesh-orb mesh-2"></div>
+    </div>
+
+    <main class="flex-1 relative p-4 md:p-6 overflow-hidden z-10 pb-20">
+        
+        <div id="conversation-view" class="view-container active-view grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8 h-full items-center max-w-6xl mx-auto">
+            
+            <section class="glass-panel hover-card rounded-[2rem] p-6 md:p-8 flex flex-col items-center text-center relative overflow-hidden h-full max-h-[80vh] justify-between border border-white/60 shadow-lg">
+                
+                <div class="flex flex-col items-center w-full mt-2">
+                    <div class="placeholder-avatar mb-6 relative">
+                        <div class="absolute inset-0 bg-blue-400/20 rounded-full blur-xl animate-pulse-slow"></div>
+                        <div class="placeholder-inner relative z-10">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-10 h-10 text-white"><path fill-rule="evenodd" d="M12 2.25a.75.75 0 0 1 .75.75v.94a4.502 4.502 0 0 1 2.806 7.348l.15.151a3 3 0 0 1 0 4.243l-.151.151a4.502 4.502 0 0 1-2.805 7.349v.939a.75.75 0 0 1-1.5 0v-.94a4.502 4.502 0 0 1-2.806-7.348l-.15-.151a3 3 0 0 1 0-4.243l.151-.151A4.502 4.502 0 0 1 11.25 3.94v-.94a.75.75 0 0 1 .75-.75ZM12.96 13.34a2.992 2.992 0 0 1 1.728 1.596l.022.044a1.5 1.5 0 0 1-2.12 2.12l-.044-.022a2.992 2.992 0 0 1-1.596-1.728l-.336-.783.783-.337Zm-2.276.346a2.992 2.992 0 0 1-1.596 1.728l-.044.022a1.5 1.5 0 0 1-2.12-2.12l.022-.044a2.992 2.992 0 0 1 1.728-1.596l.783-.337-.336.783ZM13.306 9.53l-.783.336.336.783a2.992 2.992 0 0 1 1.596 1.728l.044.022a1.5 1.5 0 0 1 2.12-2.12l-.022-.044a2.992 2.992 0 0 1-1.728-1.596Zm-2.613-1.12a2.992 2.992 0 0 1-1.728 1.596l-.022.044a1.5 1.5 0 0 1 2.12 2.12l.044-.022a2.992 2.992 0 0 1 1.596-1.728l.336-.783-.783-.337Z" clip-rule="evenodd" /></svg>
+                        </div>
+                        <div class="absolute bottom-0 right-0 w-4 h-4 bg-green-400 rounded-full border-[3px] border-white z-20"></div>
+                    </div>
+                    <h1 class="text-2xl md:text-3xl font-black text-slate-800 mb-2">Conversation Mode</h1>
+                    <p class="text-base text-slate-500 font-medium">I'm listening! What's on your mind?</p>
+                </div>
+
+                <div class="w-full max-w-xs flex flex-col gap-4 items-center relative z-10 mb-2">
+                    <div class="w-full flex items-center justify-between bg-white/70 p-3 rounded-2xl border border-blue-100/50 shadow-sm backdrop-blur-md">
+                        <div class="pl-3 font-bold text-slate-600 text-sm">Speaking: <span class="text-blue-900">English</span></div>
+                        <div class="flex items-center">
+                            <span class="text-blue-300 mx-2 text-lg">→</span>
+                            <div class="relative">
+                                <select id="conv-lang-select" class="tactile-touch appearance-none bg-blue-50/80 border-0 py-2 pl-4 pr-10 rounded-xl font-bold text-sm text-blue-600 cursor-pointer focus:ring-2 focus:ring-blue-200 outline-none shadow-sm hover:bg-blue-100 transition-all">
+                                    <option value="es" selected>Spanish 🇪🇸</option>
+                                    <option value="fr">French 🇫🇷</option>
+                                </select>
+                                <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-blue-500"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 11.168l3.71-3.938a.75.75 0 111.08 1.04l-4.25 4.5a.75.75 0 01-1.08 0l-4.25-4.5a.75.75 0 01.02-1.06z" clip-rule="evenodd" /></svg></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button id="conv-mic-btn" class="tactile-touch group relative w-full bg-slate-800 text-white rounded-[2rem] p-2 pl-3 pr-8 flex items-center shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:bg-slate-700">
+                        <div id="conv-mic-icon" class="bg-slate-600/80 w-14 h-14 rounded-[1.5rem] flex items-center justify-center transition-all duration-300 relative z-10 group-hover:scale-105">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7"><path d="M8.25 4.5a3.75 3.75 0 1 1 7.5 0v8.25a3.75 3.75 0 1 1-7.5 0V4.5Z" /><path d="M6 10.5a.75.75 0 0 1 .75.75v1.5a5.25 5.25 0 1 0 10.5 0v-1.5a.75.75 0 0 1 1.5 0v1.5a6.751 6.751 0 0 1-6 6.709v2.291h3a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1 0-1.5h3v-2.291a6.751 6.751 0 0 1-6-6.709v-1.5A.75.75 0 0 1 6 10.5Z" /></svg>  
+                        </div>
+                        <div class="flex-1 text-center relative z-10 pr-3">
+                            <span id="conv-mic-text" class="block font-black text-xl">Tap to speak</span>
+                            <span id="conv-mic-subtext" class="block text-xs opacity-80 font-bold tracking-wider uppercase mt-0.5">Visual demo only</span>
+                        </div>
+                        <div id="conv-btn-bg" class="absolute inset-0 bg-gradient-to-r from-blue-500 via-cyan-500 to-teal-400 opacity-0 transition-opacity duration-500"></div>
+                    </button>
+                    
+                    <div id="conv-voice-bars" class="mt-2 h-10 bg-slate-100/50 rounded-full flex items-center justify-center gap-1.5 px-6 overflow-hidden shadow-inner border border-white/60 backdrop-blur-md">
+                        <div class="voice-bar w-1.5 bg-slate-400 rounded-full opacity-30"></div><div class="voice-bar w-1.5 bg-slate-400 rounded-full opacity-30"></div><div class="voice-bar w-1.5 bg-slate-400 rounded-full opacity-30"></div><div class="voice-bar w-1.5 bg-slate-400 rounded-full opacity-30"></div><div class="voice-bar w-1.5 bg-slate-400 rounded-full opacity-30"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="glass-panel hover-card rounded-[2rem] p-6 md:p-8 flex flex-col h-full max-h-[80vh] relative overflow-hidden border border-white/60 shadow-lg">
+                <div class="mb-4 relative z-10 flex items-center justify-between">
+                    <div>
+                        <h2 class="text-xl font-black text-slate-800">Live Transcript</h2>
+                        <p id="conv-lang-summary" class="text-sm text-slate-500 font-bold mt-1">English → Spanish</p>
+                    </div>
+                    <button id="conv-clear-btn" class="tactile-touch p-2 text-slate-400 hover:text-red-500 bg-white/80 hover:bg-red-50/90 rounded-xl border border-slate-100 hover:border-red-200 shadow-sm transition-all group backdrop-blur-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5 group-hover:rotate-12 transition-transform"><path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" /></svg>  
+                    </button>
+                </div>
+                <div class="flex-1 flex flex-col gap-4 relative z-10 overflow-hidden rounded-[1.5rem] bg-slate-50/50 p-3 border border-slate-100/60 backdrop-blur-md">
+                    <div class="flex-1 flex flex-col h-1/2 relative">
+                        <h3 class="px-4 py-2 text-xs font-black text-blue-900/50 uppercase tracking-widest">You said</h3>
+                        <div id="history-source" class="flex-1 bg-white/90 rounded-[1.2rem] border-0 p-5 overflow-y-auto text-[16px] space-y-4 shadow-sm scroll-smooth mask-gradient-bottom backdrop-blur-sm">
+                            <p class="placeholder-text text-slate-300 italic text-center font-medium text-base mt-8">Tap the mic & start speaking...</p>
+                        </div>
+                    </div>
+                    <div class="flex-1 flex flex-col h-1/2 relative">
+                        <h3 id="target-label" class="px-4 py-2 text-xs font-black text-teal-600/70 uppercase tracking-widest">Translation (Spanish)</h3>
+                        <div id="history-target" class="flex-1 bg-teal-50/50 rounded-[1.2rem] border-0 p-5 overflow-y-auto text-[16px] space-y-4 shadow-sm scroll-smooth mask-gradient-bottom backdrop-blur-sm">
+                            <p class="placeholder-text text-teal-800/30 italic text-center font-medium text-base mt-8">Translation appears here...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div> <div id="practice-view" class="view-container hidden-view h-full flex items-center justify-center">
+            
+            <section class="glass-panel hover-card rounded-[2.5rem] shadow-xl p-8 md:p-12 flex flex-col items-center text-center border border-white/60 max-w-3xl w-full h-full max-h-[80vh] relative overflow-hidden">
+                
+                <div class="mb-8 relative z-10">
+                    <div class="w-16 h-16 bg-indigo-100/80 rounded-2xl flex items-center justify-center text-3xl shadow-sm text-indigo-600 mx-auto mb-4 backdrop-blur-md border border-indigo-200/50">🎯</div>
+                    <h2 class="text-3xl font-black text-slate-800 mb-2">Pronunciation Practice</h2>
+                    <p class="text-base text-slate-500 font-medium">Perfect your accent with instant feedback.</p>
+                </div>
+
+                <div id="practice-input-state" class="w-full max-w-lg flex flex-col gap-8 items-center relative z-10 my-auto transition-all duration-500">
+                     <div class="bg-white/70 p-6 rounded-[2rem] border border-indigo-50 shadow-sm backdrop-blur-md w-full">
+                        <p class="text-sm font-bold text-slate-500 mb-1 uppercase tracking-wider">Phrase to read:</p>
+                        <p class="text-3xl font-black text-indigo-900 leading-tight">"Hola! Como estas?"</p>
+                     </div>
+                    
+                    <button id="prac-mic-btn" class="tactile-touch group relative w-full bg-indigo-600 text-white rounded-[2rem] p-3 pl-4 pr-10 flex items-center shadow-lg overflow-hidden transition-all duration-300 hover:shadow-xl hover:bg-indigo-500 mt-2">
+                        <div id="prac-mic-icon" class="bg-indigo-800/50 w-16 h-16 rounded-[1.5rem] flex items-center justify-center transition-all duration-300 relative z-10 group-hover:scale-105">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-8 h-8"><path d="M8.25 4.5a3.75 3.75 0 1 1 7.5 0v8.25a3.75 3.75 0 1 1-7.5 0V4.5Z" /><path d="M6 10.5a.75.75 0 0 1 .75.75v1.5a5.25 5.25 0 1 0 10.5 0v-1.5a.75.75 0 0 1 1.5 0v1.5a6.751 6.751 0 0 1-6 6.709v2.291h3a.75.75 0 0 1 0 1.5h-7.5a.75.75 0 0 1 0-1.5h3v-2.291a6.751 6.751 0 0 1-6-6.709v-1.5A.75.75 0 0 1 6 10.5Z" /></svg>  
+                        </div>
+                        <div class="flex-1 text-center relative z-10 pr-4">
+                            <span id="prac-mic-text" class="block font-black text-2xl">Read Aloud</span>
+                            <span id="prac-mic-subtext" class="block text-sm opacity-80 font-bold tracking-wider uppercase mt-1">Tap when ready</span>
+                        </div>
+                        <div id="prac-btn-bg" class="absolute inset-0 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 opacity-0 transition-opacity duration-500"></div>
+                    </button>
+                     <div id="prac-voice-bars" class="h-12 bg-slate-100/50 rounded-full flex items-center justify-center gap-2 px-8 overflow-hidden shadow-inner border border-white/60 backdrop-blur-md opacity-0 transition-all duration-300 scale-95">
+                        <div class="voice-bar w-2 bg-indigo-400 rounded-full"></div><div class="voice-bar w-2 bg-indigo-400 rounded-full"></div><div class="voice-bar w-2 bg-indigo-400 rounded-full"></div><div class="voice-bar w-2 bg-indigo-400 rounded-full"></div><div class="voice-bar w-2 bg-indigo-400 rounded-full"></div>
+                    </div>
+                </div>
+
+                <div id="practice-results-state" class="w-full flex flex-col gap-6 relative z-10 hidden opacity-0 transition-all duration-500 delay-100 scale-95">
+                    <div class="flex-1 flex flex-col md:flex-row gap-4">
+                        <div class="flex-1 flex flex-col bg-slate-50/60 rounded-[2rem] p-5 border border-slate-200/60 backdrop-blur-md shadow-sm">
+                            <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-3 pl-2">1. What we heard</h3>
+                            <div class="flex-1 bg-white/90 rounded-[1.5rem] p-4 flex flex-col items-center justify-center shadow-sm border border-white/80 gap-3">
+                                <p class="text-lg font-bold text-slate-700 text-center leading-tight">"Hola, como estas?"</p>
+                                <button class="tactile-touch flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-full font-bold transition-colors text-xs">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-3 h-3"><path fill-rule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd" /></svg>
+                                    Play back
+                                </button>
+                            </div>
+                        </div>
+                        <div class="flex-1 flex flex-col bg-amber-50/60 rounded-[2rem] p-5 border border-amber-200/60 backdrop-blur-md shadow-sm">
+                            <h3 class="text-xs font-black text-amber-600/70 uppercase tracking-widest mb-3 pl-2">2. Analysis</h3>
+                            <div class="flex-1 bg-white/90 rounded-[1.5rem] p-4 flex flex-col items-center justify-center shadow-sm gap-3 border border-white/80">
+                                <div class="flex items-center gap-2"><span class="text-amber-500 font-bold text-base">Score:</span><span class="font-black text-3xl text-amber-500">85%</span></div>
+                                <p class="text-sm font-bold text-amber-800/90 text-center bg-amber-100/80 px-4 py-2 rounded-xl">Watch the stress on "estas".</p>
+                            </div>
+                        </div>
+                        <div class="flex-1 flex flex-col bg-emerald-50/60 rounded-[2rem] p-5 border border-emerald-200/60 backdrop-blur-md shadow-sm">
+                            <h3 class="text-xs font-black text-emerald-600/70 uppercase tracking-widest mb-3 pl-2">3. The Correct Way</h3>
+                            <div class="flex-1 bg-white/90 rounded-[1.5rem] p-4 flex flex-col items-center justify-center shadow-sm gap-3 border border-white/80">
+                                <p class="text-xl font-black text-emerald-700 text-center leading-tight">"Hola! Como estas?"</p>
+                                <button class="tactile-touch flex items-center gap-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-4 py-2 rounded-full font-bold transition-colors text-sm shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-4 h-4"><path fill-rule="evenodd" d="M4.5 5.653c0-1.426 1.529-2.33 2.779-1.643l11.54 6.348c1.295.712 1.295 2.573 0 3.285L7.28 19.991c-1.25.687-2.779-.217-2.779-1.643V5.653Z" clip-rule="evenodd" /></svg>Listen</button>
+                            </div>
+                        </div>
+                    </div>
+                    <button id="prac-reset-btn" class="tactile-touch w-full py-3 bg-white/80 border-2 border-indigo-100 text-indigo-600 rounded-[2rem] font-black text-lg hover:bg-indigo-50/80 transition-all shadow-sm backdrop-blur-md">Try another phrase</button>
+                </div>
+
+            </section>
+        </div> </main>
+
+
+    <nav class="fixed bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[400px] bg-white/80 backdrop-blur-2xl border border-white/60 p-2 rounded-full shadow-xl shadow-slate-900/5 z-50">
+        <div class="flex bg-slate-100/60 p-1 rounded-full relative border border-slate-200/50">
+            <div id="nav-indicator" class="absolute left-1 top-1 w-[calc(50%-4px)] h-[calc(100%-8px)] bg-white rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.05)] border border-white transition-all duration-500 ease-[cubic-bezier(0.34,1.56,0.64,1)]"></div>
+            <button id="nav-conv-btn" class="flex-1 relative z-10 text-center py-3 text-sm font-extrabold text-slate-800 transition-colors duration-300">Conversation</button>
+            <button id="nav-prac-btn" class="flex-1 relative z-10 text-center py-3 text-sm font-extrabold text-slate-400 transition-colors duration-300">Practice</button>
+        </div>
+    </nav>
+
+    <script src="script.js"></script>
+</body>
 </html>

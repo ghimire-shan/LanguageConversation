@@ -1,0 +1,208 @@
+/* =========================================
+   GLOBAL RESET & BASE STYLES
+   ========================================= */
+/* Ensure consistent box-sizing globally */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* =========================================
+   Z-INDEX MANAGEMENT LAYER
+   =========================================
+   Background Mesh: -20
+   View Container (Hidden): 0
+   View Container (Active): 10
+   ========================================= */
+
+
+/* =========================================
+   AMBIENT MESH BACKGROUND
+   Subtle, slow-moving gradient orbs behind content.
+   ========================================= */
+.mesh-background {
+    position: fixed;
+    inset: 0; /* Shorthand for top:0, right:0, bottom:0, left:0 */
+    z-index: -20;
+    pointer-events: none;
+    overflow: hidden;
+    background-color: #f8fafc;
+}
+
+.mesh-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(120px);
+    opacity: 0.4;
+    mix-blend-mode: multiply;
+    /* Performance optimization: hint browser that transform will change */
+    will-change: transform;
+}
+
+.mesh-1 {
+    top: -20%;
+    left: -20%;
+    width: 80vw;
+    height: 80vw;
+    background: #dbeafe;
+    animation: meshMove 30s ease-in-out infinite alternate;
+}
+
+.mesh-2 {
+    bottom: -20%;
+    right: -20%;
+    width: 80vw;
+    height: 80vw;
+    background: #e0e7ff;
+    /* Slightly different timing/direction for organic feel */
+    animation: meshMove 35s ease-in-out infinite alternate-reverse;
+}
+
+@keyframes meshMove {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(20%, 20%) scale(1.1); }
+}
+
+
+/* =========================================
+   VIEW SWITCHING UTILITIES
+   Handles transitions between different app states.
+   ========================================= */
+.view-container {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    /* Smooth cubic-bezier for snappy yet smooth transitions */
+    transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform, opacity, filter;
+}
+
+.active-view {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+    z-index: 10;
+    pointer-events: auto;
+    filter: blur(0px);
+}
+
+.hidden-view {
+    opacity: 0;
+    /* Slight scale down combined with translate for depth effect */
+    transform: translateY(20px) scale(0.98);
+    z-index: 0;
+    pointer-events: none;
+    filter: blur(4px);
+}
+
+
+/* =========================================
+   COMPONENT STYLES
+   ========================================= */
+
+/* --- Restored Hover Effect (Stable 2D lift) --- */
+.hover-card {
+    transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    will-change: transform, box-shadow;
+}
+
+/* Only apply hover effects on devices that support hovering */
+@media (hover: hover) {
+    .hover-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.08);
+        border-color: rgba(255, 255, 255, 0.9);
+    }
+}
+
+/* --- Placeholder Avatar CSS (Medium Size) --- */
+.placeholder-avatar {
+    width: 100px;
+    height: 100px;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.placeholder-inner {
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%);
+    border-radius: 50%;
+    border: 4px solid rgba(255, 255, 255, 0.9);
+    box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4), inset 0 4px 15px rgba(255,255,255,0.4);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.animate-pulse-slow {
+    animation: pulseSlow 3s ease-in-out infinite;
+}
+
+@keyframes pulseSlow {
+    0%, 100% { opacity: 0.6; transform: scale(1.05); }
+    50% { opacity: 0.3; transform: scale(0.98); }
+}
+
+/* --- Glass Panel Styling --- */
+.glass-panel {
+    background: rgba(255, 255, 255, 0.6);
+    /* Includes webkit prefix for wider browser support (Safari) */
+    -webkit-backdrop-filter: blur(24px) saturate(110%);
+    backdrop-filter: blur(24px) saturate(110%);
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+
+/* =========================================
+   ANIMATIONS & UTILITIES
+   ========================================= */
+
+/* --- Voice Bars Animation --- */
+.voice-bar {
+    height: 20%;
+    will-change: height;
+    transition: height 0.2s ease-in-out;
+}
+
+/* Staggered animation delays for the waveform effect */
+.animate-voice .voice-bar:nth-child(1) { animation: bounceBar 0.8s infinite 0.1s; }
+.animate-voice .voice-bar:nth-child(2) { animation: bounceBar 0.6s infinite 0.3s; }
+.animate-voice .voice-bar:nth-child(3) { animation: bounceBar 0.7s infinite 0.0s; }
+.animate-voice .voice-bar:nth-child(4) { animation: bounceBar 0.5s infinite 0.4s; }
+.animate-voice .voice-bar:nth-child(5) { animation: bounceBar 0.6s infinite 0.2s; }
+
+@keyframes bounceBar {
+    0%, 100% { height: 25%; }
+    50% { height: 95%; }
+}
+
+/* --- Utilities --- */
+
+/* Fades out the bottom of an element using a mask */
+.mask-gradient-bottom {
+    -webkit-mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+    mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
+}
+
+/* Provides a physical "press" feeling on click */
+.tactile-touch {
+    transition: transform 0.1s, background-color 0.1s, border-color 0.1s;
+    cursor: pointer;
+}
+
+.tactile-touch:active {
+    transform: scale(0.97);
+}
+
+/* Hides scrollbars while retaining scroll functionality */
+.overflow-y-auto {
+    overflow-y: auto;
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
+
+.overflow-y-auto::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera */
+}

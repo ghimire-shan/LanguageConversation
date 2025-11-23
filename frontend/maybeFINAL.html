@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Language App Final - Original Colors</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <style>
+        /* --- CSS VARIABLES --- */
+        :root {
+            --bg-color: #F8FAFC;
+            --card-bg: #FFFFFF;
+            --card-hover-bg: #F8FAFC;
+            --text-primary: #1A1A1A;
+            --text-secondary: #6B7280;
+            /* RESTORED: Original vibrant blue/teal accent colors */
+            --accent-blue: #3B82F6; /* Primary blue */
+            --accent-teal: #14B8A6; /* Vibrant teal for translations */
+            --accent-green: #10B981;
+            --button-dark: #1F2937;
+            --border-light: #E2E8F0;
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+            --radius-lg: 24px;
+            --radius-md: 16px;
+        }
+
+        /* --- BASE STYLES --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            min-height: 100vh;
+        }
+
+        /* --- VIEW SWITCHING UTILITIES --- */
+        .view-container {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            padding: 1rem;
+        }
+        @media (min-width: 768px) { .view-container { padding: 2rem; } }
+
+        .active-view { opacity: 1; transform: translateY(0) scale(1); z-index: 10; pointer-events: auto; filter: blur(0px); }
+        .hidden-view { opacity: 0; transform: translateY(20px) scale(0.98); z-index: 0; pointer-events: none; filter: blur(4px); }
+
+        /* --- MAIN LAYOUT CONTAINER --- */
+        .main-layout-grid {
+            display: flex; justify-content: center; gap: 2rem; max-width: 1000px; width: 100%;
+            margin: 0 auto; height: 100%; align-items: stretch;
+        }
+        @media (max-width: 768px) { .main-layout-grid { flex-direction: column; height: auto; } }
+
+
+        /* --- THE CARD STYLES & HOVER EFFECT --- */
+        .app-card {
+            background-color: var(--card-bg);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+            padding: 2.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-light);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* THE PERFECTED HOVER STATE */
+        @media (hover: hover) {
+            .app-card:hover {
+                background-color: var(--card-hover-bg);
+                transform: translateY(-8px);
+                box-shadow: var(--shadow-lg);
+                border-color: #CBD5E1;
+            }
+        }
+
+        .card-centered { align-items: center; text-align: center; justify-content: center; }
+
+
+        /* --- COMPONENT STYLES --- */
+        .avatar {
+            width: 80px; height: 80px;
+            /* Original blue gradient */
+            background: linear-gradient(135deg, #60A5FA, #3B82F6);
+            border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 32px; color: white; box-shadow: var(--shadow-md);
+        }
+
+        .mic-button {
+            /* Default dark background */
+            background-color: var(--button-dark);
+            color: white; width: 100%; padding: 1rem;
+            border-radius: 100px; display: flex; align-items: center; justify-content: center;
+            gap: 1rem; cursor: pointer; transition: all 0.2s ease;
+            box-shadow: var(--shadow-md);
+            position: relative; overflow: hidden; z-index: 1;
+        }
+        .mic-button:hover { transform: scale(1.02); box-shadow: var(--shadow-lg); }
+        .mic-button:active { transform: scale(0.98); }
+
+        /* RESTORED: Vibrant gradient background for active state */
+        .mic-button.active-state {
+            background: linear-gradient(to right, var(--accent-blue), var(--accent-teal));
+        }
+
+        /* Voice Bar Animations */
+        .voice-bar { width: 4px; height: 4px; background-color: var(--text-secondary); border-radius: 2px; opacity: 0.3; transition: all 0.2s ease; }
+        /* RESTORED: Vibrant blue for active bars */
+        .animate-voice .voice-bar { opacity: 1 !important; background-color: var(--accent-blue) !important; }
+        .animate-voice .voice-bar:nth-child(1) { animation: bounceBar 0.8s infinite 0.1s; }
+        .animate-voice .voice-bar:nth-child(2) { animation: bounceBar 0.6s infinite 0.3s; }
+        .animate-voice .voice-bar:nth-child(3) { animation: bounceBar 0.7s infinite 0.0s; }
+        .animate-voice .voice-bar:nth-child(4) { animation: bounceBar 0.5s infinite 0.4s; }
+        .animate-voice .voice-bar:nth-child(5) { animation: bounceBar 0.6s infinite 0.2s; }
+        @keyframes bounceBar { 0%, 100% { height: 24px; } 50% { height: 40px; } }
+
+        .transcript-box {
+            flex: 1; background-color: var(--bg-color); border-radius: var(--radius-md);
+            padding: 1.5rem; margin-bottom: 1.5rem; display: flex; flex-direction: column;
+            border: 1px solid var(--border-light); transition: border-color 0.3s ease;
+        }
+        .app-card:hover .transcript-box { border-color: #CBD5E1; }
+
+        /* RESTORED: Teal color for translation bubbles */
+        .translation-bubble {
+            background-color: var(--accent-teal);
+            color: white;
+            font-weight: 700;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            box-shadow: var(--shadow-sm);
+        }
+
+        /* Bottom Nav Specifics */
+        .bottom-nav-container {
+            position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
+            width: 100%; max-width: 400px; z-index: 50;
+        }
+        .bottom-nav {
+            background-color: var(--card-bg); padding: 0.5rem; border-radius: 100px;
+            box-shadow: var(--shadow-lg); display: flex; gap: 0.5rem; border: 1px solid var(--border-light);
+        }
+        .nav-button {
+            padding: 0.75rem 2rem; border-radius: 100px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; flex: 1; text-align: center;
+        }
+        .nav-button.active { background-color: var(--bg-color); color: var(--text-primary); box-shadow: var(--shadow-sm); }
+        .nav-button.inactive { color: var(--text-secondary); background-color: transparent; }
+        .nav-button.inactive:hover { background-color: rgba(0,0,0,0.03); }
+
+        /* Utilities */
+        .tactile-touch { transition: transform 0.1s; cursor: pointer; }
+        .tactile-touch:active { transform: scale(0.95); }
+        /* Clean scrollbars */
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="h-full overflow-hidden bg-[#F8FAFC]">
+
+    <main class="relative h-full w-full overflow-hidden pb-24">
+        
+
+        <div id="conversation-view" class="view-container active-view">
+            <div class="main-layout-grid">
+            
+                <section class="app-card card-centered md:max-h-[80vh]">
+                    <div class="avatar-container relative mb-6">
+                        <div class="avatar">
+                            <i class="ph-bold ph-user-circle"></i>
+                        </div>
+                        <div class="absolute bottom-0 right-0 w-4 h-4 bg-green-400 rounded-full border-[3px] border-white animate-pulse"></div>
+                    </div>
+                    <h1 class="text-2xl md:text-3xl font-bold text-slate-800 mb-2 tracking-tight">Conversation Mode</h1>
+                    <p class="text-base text-slate-500 font-medium mb-8">I'm listening! What's on your mind?</p>
+
+                    <div class="w-full max-w-xs flex flex-col gap-4 items-center relative z-10 mb-2">
+                        <div class="w-full flex items-center justify-between bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm transition-colors hover:border-blue-200">
+                            <div class="pl-3 font-bold text-slate-600 text-sm">Speaking: <span class="text-blue-600">English</span></div>
+                            <div class="flex items-center gap-2 text-blue-600 relative">
+                                <i class="ph-bold ph-arrow-right"></i>
+                                <select id="conv-lang-select" class="appearance-none bg-transparent font-bold text-sm text-blue-600 cursor-pointer outline-none pr-6 z-10 relative py-1">
+                                    <option value="es">Spanish 🇪🇸</option>
+                                    <option value="fr">French 🇫🇷</option>
+                                </select>
+                                <i class="ph-bold ph-caret-down absolute right-0 pointer-events-none"></i>
+                            </div>
+                        </div>
+
+                        <button id="conv-mic-btn" class="mic-button group">
+                            <i id="conv-mic-icon" class="ph-fill ph-microphone text-2xl transition-all"></i>
+                            <div class="text-left">
+                                <span id="conv-mic-text" class="block font-bold text-lg">Tap to speak</span>
+                                <span id="conv-mic-subtext" class="block text-xs opacity-70">VISUAL DEMO ONLY</span>
+                            </div>
+                        </button>
+                        
+                        <div id="conv-voice-bars" class="mt-2 h-10 flex items-center justify-center gap-1.5">
+                            <div class="voice-bar"></div><div class="voice-bar"></div><div class="voice-bar"></div><div class="voice-bar"></div><div class="voice-bar"></div>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="app-card md:max-h-[80vh]">
+                    <div class="mb-4 flex items-center justify-between">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800 tracking-tight">Live Transcript</h2>
+                            <p id="conv-lang-summary" class="text-sm text-slate-500 font-medium mt-1">English <i class="ph-bold ph-arrow-right text-xs mx-1"></i> <span class="text-green-500">Spanish</span></p>
+                        </div>
+                        <i class="ph-bold ph-trash text-slate-400 text-xl cursor-pointer hover:text-red-500 transition-colors p-2 tactile-touch" id="conv-clear-btn"></i>
+                    </div>
+
+                    <div class="flex-1 flex flex-col gap-4 overflow-hidden">
+                        <div class="transcript-box">
+                            <span class="text-xs font-bold text-slate-500 tracking-wider mb-4 block">YOU SAID</span>
+                            <div id="history-source" class="flex-1 overflow-y-auto no-scrollbar flex flex-col justify-center gap-3">
+                                <p class="text-slate-700 font-bold bg-white p-3 rounded-xl shadow-sm border border-slate-100">Hello, how are you?</p>
+                                <p class="text-slate-700 font-bold bg-white p-3 rounded-xl shadow-sm border border-slate-100">Where is the bathroom?</p>
+                                <p class="text-slate-700 font-bold bg-white p-3 rounded-xl shadow-sm border border-slate-100">A coffee, please.</p>
+                            </div>
+                        </div>
+                        <div class="transcript-box mb-0">
+                            <span id="target-translation-label" class="text-xs font-bold text-green-600 tracking-wider mb-4 block">TRANSLATION (SPANISH)</span>
+                            <div id="history-target" class="flex-1 overflow-y-auto no-scrollbar flex flex-col justify-center gap-3">
+                                <p class="translation-bubble">Hola, ¿cómo estás?</p>
+                                <p class="translation-bubble">¿Dónde está el baño?</p>
+                                <p class="translation-bubble">Un café, por favor.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div> <div id="practice-view" class="view-container hidden-view">
+             <div class="main-layout-grid items-center">
+            
+                <section class="app-card card-centered max-w-3xl mx-auto md:max-h-[80vh]">
+                    
+                    <div class="mb-8">
+                        <div class="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 mx-auto mb-4 shadow-sm border border-indigo-50">
+                            <i class="ph-fill ph-speaker-high text-3xl"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold text-slate-800 mb-2 tracking-tight">Pronunciation Practice</h2>
+                        <p class="text-base text-slate-500 font-medium">Perfect your accent with instant feedback.</p>
+                    </div>
+
+                    <div id="practice-input-state" class="w-full max-w-lg flex flex-col gap-8 items-center transition-all duration-500">
+                         <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 w-full shadow-sm">
+                            <p class="text-sm font-bold text-slate-500 mb-1 uppercase tracking-wider">Phrase to read:</p>
+                            <p class="text-3xl font-black text-indigo-900 leading-tight">"Buenos días, amigo."</p>
+                         </div>
+                        
+                        <button id="prac-mic-btn" class="mic-button bg-indigo-600 hover:bg-indigo-700 text-white">
+                            <i id="prac-mic-icon" class="ph-fill ph-microphone text-3xl transition-all"></i>
+                            <div class="text-left">
+                                <span id="prac-mic-text" class="block font-bold text-2xl">Read Aloud</span>
+                                <span id="prac-mic-subtext" class="block text-sm opacity-80 tracking-wider">Tap when ready</span>
+                            </div>
+                        </button>
+                         <div id="prac-voice-bars" class="h-10 flex items-center justify-center gap-2 opacity-0 transition-all duration-300 scale-95">
+                            <div class="voice-bar bg-indigo-400"></div><div class="voice-bar bg-indigo-400"></div><div class="voice-bar bg-indigo-400"></div><div class="voice-bar bg-indigo-400"></div><div class="voice-bar bg-indigo-400"></div>
+                        </div>
+                    </div>
+
+                    <div id="practice-results-state" class="w-full flex flex-col gap-6 hidden opacity-0 transition-all duration-500 delay-100 scale-95">
+                        <div class="flex-1 flex flex-col md:flex-row gap-4 items-stretch">
+                            <div class="flex-1 bg-slate-50 rounded-2xl p-5 border border-slate-200 text-left flex flex-col shadow-sm">
+                                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">1. What we heard</h3>
+                                <div class="flex-1 bg-white rounded-xl p-4 flex flex-col items-center justify-center shadow-sm border border-slate-100 gap-3">
+                                    <p class="text-lg font-bold text-slate-700 text-center leading-tight">"Buenos dias amigo"</p>
+                                    <button class="tactile-touch flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-full font-bold transition-colors text-xs">
+                                        <i class="ph-bold ph-play"></i> Play back
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="flex-1 bg-amber-50 rounded-2xl p-5 border border-amber-200 text-left flex flex-col shadow-sm">
+                                <h3 class="text-xs font-bold text-amber-600 uppercase tracking-widest mb-3">2. Analysis</h3>
+                                <div class="flex-1 bg-white rounded-xl p-4 flex flex-col items-center justify-center shadow-sm gap-3 border border-amber-100">
+                                    <div class="flex items-center gap-2"><span class="text-amber-600 font-bold text-base">Score:</span><span class="font-black text-3xl text-amber-500">85%</span></div>
+                                    <p class="text-sm font-bold text-amber-800 text-center bg-amber-100 px-4 py-2 rounded-xl leading-tight">Don't forget the accent on "días".</p>
+                                </div>
+                            </div>
+                            <div class="flex-1 bg-emerald-50 rounded-2xl p-5 border border-emerald-200 text-left flex flex-col shadow-sm">
+                                <h3 class="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-3">3. The Correct Way</h3>
+                                <div class="flex-1 bg-white rounded-xl p-4 flex flex-col items-center justify-center shadow-sm gap-3 border border-emerald-100">
+                                    <p class="text-xl font-black text-emerald-700 text-center leading-tight">"Buenos días, amigo."</p>
+                                    <button class="tactile-touch flex items-center gap-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-4 py-2 rounded-full font-bold transition-colors text-sm">
+                                        <i class="ph-bold ph-speaker-high"></i> Listen
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <button id="prac-reset-btn" class="tactile-touch w-full py-3 bg-white border-2 border-indigo-100 text-indigo-600 rounded-full font-bold text-lg hover:bg-indigo-50 transition-all shadow-sm">Try another phrase</button>
+                    </div>
+
+                </section>
+            </div>
+        </div> </main>
+
+
+    <div class="bottom-nav-container">
+        <div class="bottom-nav">
+            <div id="nav-conv-btn" class="nav-button active">Conversation</div>
+            <div id="nav-prac-btn" class="nav-button inactive">Practice</div>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // ================= NAVIGATION LOGIC =================
+            const navConvBtn = document.getElementById('nav-conv-btn');
+            const navPracBtn = document.getElementById('nav-prac-btn');
+            const conversationView = document.getElementById('conversation-view');
+            const practiceView = document.getElementById('practice-view');
+
+            function switchToConversation() {
+                navConvBtn.classList.add('active'); navConvBtn.classList.remove('inactive');
+                navPracBtn.classList.remove('active'); navPracBtn.classList.add('inactive');
+                conversationView.classList.add('active-view'); conversationView.classList.remove('hidden-view');
+                practiceView.classList.remove('active-view'); practiceView.classList.add('hidden-view');
+            }
+
+            function switchToPractice() {
+                navPracBtn.classList.add('active'); navPracBtn.classList.remove('inactive');
+                navConvBtn.classList.remove('active'); navConvBtn.classList.add('inactive');
+                practiceView.classList.add('active-view'); practiceView.classList.remove('hidden-view');
+                conversationView.classList.remove('active-view'); conversationView.classList.add('hidden-view');
+            }
+
+            navConvBtn.addEventListener('click', switchToConversation);
+            navPracBtn.addEventListener('click', switchToPractice);
+
+
+            // ================= CONVERSATION MODE LOGIC =================
+            const convMicBtn = document.getElementById('conv-mic-btn');
+            const convMicIcon = document.getElementById('conv-mic-icon');
+            const convMicText = document.getElementById('conv-mic-text');
+            const convMicSubtext = document.getElementById('conv-mic-subtext');
+            const convVoiceBars = document.getElementById('conv-voice-bars');
+            const convClearBtn = document.getElementById('conv-clear-btn');
+            const historySource = document.getElementById('history-source');
+            const historyTarget = document.getElementById('history-target');
+            const convLangSelect = document.getElementById('conv-lang-select');
+            const convLangSummary = document.getElementById('conv-lang-summary');
+            const targetTranslationLabel = document.getElementById('target-translation-label');
+
+
+            // FUNCTION TO UPDATE UI WHEN LANGUAGE DROPDOWN CHANGES
+            function updateConvLanguageUI() {
+                const selectedText = convLangSelect.options[convLangSelect.selectedIndex].text;
+                const targetLangName = selectedText.split(' ')[0];
+                // Update summary and label
+                convLangSummary.innerHTML = `English <i class="ph-bold ph-arrow-right text-xs mx-1"></i> <span class="text-green-500">${targetLangName}</span>`;
+                targetTranslationLabel.textContent = `TRANSLATION (${targetLangName.toUpperCase()})`;
+            }
+
+            // Listen for changes on the dropdown
+            convLangSelect.addEventListener('change', updateConvLanguageUI);
+
+
+            // MIC TOGGLE LOGIC
+            let isConvMicActive = false;
+            function handleConvMicToggle() {
+                isConvMicActive = !isConvMicActive;
+                if (isConvMicActive) {
+                    // RESTORED: Add active state class for gradient background
+                    convMicBtn.classList.add('active-state');
+                    convMicIcon.classList.remove('ph-microphone'); convMicIcon.classList.add('ph-waveform', 'animate-pulse');
+                    convMicText.textContent = "Listening..."; convMicSubtext.textContent = "Speak clearly";
+                    convVoiceBars.classList.add('animate-voice');
+                } else {
+                    // RESTORED: Remove active state class
+                    convMicBtn.classList.remove('active-state');
+                    convMicIcon.classList.add('ph-microphone'); convMicIcon.classList.remove('ph-waveform', 'animate-pulse');
+                    convMicText.textContent = "Tap to speak"; convMicSubtext.textContent = "Visual demo only";
+                    convVoiceBars.classList.remove('animate-voice');
+                    // Add a new message demonstration
+                    sendDemoMessage();
+                }
+            }
+
+            function sendDemoMessage() {
+                const targetLangCode = convLangSelect.value;
+                let demoResponse = "Hola, ¿cómo estás?"; // Default Spanish
+                if (targetLangCode === 'fr') {
+                    demoResponse = "Bonjour, comment allez-vous ?";
+                }
+                
+                // Add new messages to the list
+                const newSource = document.createElement('p');
+                newSource.className = "text-slate-700 font-bold bg-white p-3 rounded-xl shadow-sm border border-slate-100 animate-pulse";
+                newSource.textContent = "Hello, how are you?";
+                historySource.appendChild(newSource);
+                historySource.scrollTop = historySource.scrollHeight;
+
+                setTimeout(() => {
+                    newSource.classList.remove('animate-pulse');
+                    const newTarget = document.createElement('p');
+                    // RESTORED: Use the translation bubble class
+                    newTarget.className = "translation-bubble animate-bounce";
+                    newTarget.textContent = demoResponse;
+                    historyTarget.appendChild(newTarget);
+                    historyTarget.scrollTop = historyTarget.scrollHeight;
+                    setTimeout(() => newTarget.classList.remove('animate-bounce'), 1000);
+                }, 800);
+            }
+
+            convMicBtn.addEventListener('click', handleConvMicToggle);
+            
+            // Clear button logic
+            convClearBtn.addEventListener('click', () => {
+                historySource.innerHTML = '<p class="text-slate-400 italic text-center">Tap the mic & start speaking...</p>';
+                historyTarget.innerHTML = '<p class="text-green-600/50 italic text-center">Translation appears here...</p>';
+            });
+
+
+            // ================= PRACTICE MODE FLOW LOGIC =================
+            const pracMicBtn = document.getElementById('prac-mic-btn');
+            const pracMicIcon = document.getElementById('prac-mic-icon');
+            const pracMicText = document.getElementById('prac-mic-text');
+            const pracMicSubtext = document.getElementById('prac-mic-subtext');
+            const pracVoiceBars = document.getElementById('prac-voice-bars');
+            const practiceInputState = document.getElementById('practice-input-state');
+            const practiceResultsState = document.getElementById('practice-results-state');
+            const pracResetBtn = document.getElementById('prac-reset-btn');
+
+            let isPracMicActive = false;
+
+            function handlePracMicClick() {
+                if (!isPracMicActive) {
+                    isPracMicActive = true;
+                    pracMicBtn.style.backgroundColor = 'var(--accent-blue)';
+                    pracMicIcon.classList.add('animate-pulse');
+                    pracMicText.textContent = "Listening..."; pracMicSubtext.textContent = "Tap to finish";
+                    pracVoiceBars.classList.remove('opacity-0', 'scale-95'); pracVoiceBars.classList.add('animate-voice', 'scale-100');
+                } else {
+                    isPracMicActive = false;
+                    practiceInputState.classList.add('opacity-0', '-translate-y-5', 'scale-95');
+                    setTimeout(() => {
+                            practiceInputState.classList.add('hidden');
+                            practiceResultsState.classList.remove('hidden');
+                            setTimeout(() => {
+                                practiceResultsState.classList.remove('opacity-0', 'scale-95');
+                            }, 50);
+                    }, 300);
+                }
+            }
+
+            function resetPractice() {
+                practiceResultsState.classList.add('opacity-0', 'scale-95');
+                setTimeout(() => {
+                    practiceResultsState.classList.add('hidden');
+                    practiceInputState.classList.remove('hidden');
+                    pracMicBtn.style.backgroundColor = 'var(--accent-blue)'; /* Reset color */
+                    pracMicIcon.classList.remove('animate-pulse');
+                    pracMicText.textContent = "Read Aloud"; pracMicSubtext.textContent = "Tap when ready";
+                    pracVoiceBars.classList.add('opacity-0', 'scale-95'); pracVoiceBars.classList.remove('animate-voice', 'scale-100');
+                    setTimeout(() => {
+                        practiceInputState.classList.remove('opacity-0', '-translate-y-5', 'scale-95');
+                    }, 50);
+                }, 300);
+            }
+
+            pracMicBtn.addEventListener('click', handlePracMicClick);
+            pracResetBtn.addEventListener('click', resetPractice);
+
+            // Initialize UI on load
+            updateConvLanguageUI();
+        });
+    </script>
+</body>
+</html>

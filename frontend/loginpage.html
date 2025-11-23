@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Self Language Learner AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Custom style just for confetti pieces */
+    .confetti-piece {
+      position: absolute;
+      pointer-events: none;
+      z-index: 0;
+    }
+    /* Subtle slow bounce animation for the widget container */
+    @keyframes bounce-slow {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-5px); }
+    }
+    .animate-bounce-slow {
+        animation: bounce-slow 3s infinite ease-in-out;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 font-sans relative min-h-screen overflow-hidden flex items-center justify-center">
+
+  <div id="confetti-container" class="absolute inset-0 pointer-events-none"></div>
+
+  <section class="p-4 relative z-10 w-full max-w-md">
+    <div class="bg-white rounded-3xl shadow-2xl p-8 text-center transition-all duration-300 hover:shadow-[#002D74]/20">
+      <h2 class="font-bold text-3xl text-[#002D74] mb-6">Login</h2>
+
+      <form action="" class="flex flex-col gap-4 text-left">
+        <div>
+            <label class="text-sm font-medium text-gray-700 ml-1 mb-1 block">Email</label>
+            <input class="p-3 rounded-xl border w-full bg-gray-50 transition-all duration-300 hover:border-blue-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none" type="email" name="email" placeholder="Email usr@gmail.com">
+        </div>
+        
+        <div class="relative">
+            <label class="text-sm font-medium text-gray-700 ml-1 mb-1 block">Password</label>
+            <input class="p-3 rounded-xl border w-full bg-gray-50 pr-10 transition-all duration-300 hover:border-blue-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-100 outline-none" type="password" name="password" placeholder="Password">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="gray" class="absolute top-[38px] right-3 cursor-pointer transition-all duration-300 hover:fill-blue-600 hover:scale-110" viewBox="0 0 16 16">
+              <path d="M16 8s-3-5.5-8-5.5S0 8 0 8s3 5.5 8 5.5S16 8 16 8zM1.173 8a13.133 13.133 0 0 1 1.66-2.043C4.12 4.668 5.88 3.5 8 3.5c2.12 0 3.879 1.168 5.168 2.457A13.133 13.133 0 0 1 14.828 8c-.058.087-.122.183-.195.288-.335.48-.83 1.12-1.465 1.755C11.879 11.332 10.119 12.5 8 12.5c-2.12 0-3.879-1.168-5.168-2.457A13.134 13.134 0 0 1 1.172 8z" />
+              <path d="M8 5.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5zM4.5 8a3.5 3.5 0 1 1 7 0 3.5 3.5 0 0 1-7 0z" />
+            </svg>
+        </div>
+      </form>
+
+      <button class="bg-white border py-3 w-full rounded-xl mt-6 flex justify-center items-center text-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:bg-gray-50 text-[#002D74] font-medium">
+        <svg class="mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px">
+          <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z" />
+          <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z" />
+          <path fill="#4CAF50" d="M24,44c5.166,0,9.86-1.977,13.409-5.192l-6.19-5.238C29.211,35.091,26.715,36,24,36c-5.202,0-9.619-3.317-11.283-7.946l-6.522,5.025C9.505,39.556,16.227,44,24,44z" />
+          <path fill="#1976D2" d="M43.611,20.083H42V20H24v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z" />
+        </svg>
+        Google login
+      </button>
+
+      <div class="mt-6 grid grid-cols-3 items-center text-gray-300">
+        <hr class="border-gray-300">
+        <p class="text-center text-xs uppercase">OR</p>
+        <hr class="border-gray-300">
+      </div>
+
+      <button class="mt-6 text-sm text-[#002D74] transition-all duration-300 hover:text-blue-800 hover:underline hover:scale-105">Register with a new account</button>
+      
+      <div class="mt-4 text-xs text-gray-400">
+        <a href="#" class="transition-all duration-300 hover:text-[#002D74] hover:underline">Forgot your password?</a>
+      </div>
+    </div>
+  </section>
+
+  <div class="fixed bottom-6 right-6 z-50 flex items-center gap-3 animate-bounce-slow">
+    <div class="bg-[#1e293b] text-white pl-2 pr-5 py-2 rounded-full flex items-center shadow-xl cursor-pointer transition-all duration-300 hover:bg-[#002D74] hover:scale-105 active:scale-95">
+        <img src="https://placehold.co/48x48/3B82F6/ffffff?text=AI" alt="AI Logo" class="w-11 h-11 mr-3 rounded-full object-cover border-2 border-white/20">
+        <span class="font-semibold">Self Language Learner AI</span>
+    </div>
+    
+    <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center shadow-xl overflow-hidden p-1 cursor-pointer transition-all duration-300 hover:rotate-12 hover:scale-110">
+         <img src="https://placehold.co/64x64/002D74/ffffff?text=MH" alt="Mad Hacks Logo" class="w-full h-full rounded-full object-cover">
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const confettiContainer = document.getElementById('confetti-container');
+        const colors = ['#FFC107', '#3B82F6', '#10B981', '#fbbf24', '#60a5fa', '#34d399']; 
+        const numConfetti = 120; 
+
+        for (let i = 0; i < numConfetti; i++) {
+            const confetti = document.createElement('div');
+            confetti.classList.add('confetti-piece');
+            confetti.style.left = Math.random() * 100 + 'vw';
+            confetti.style.top = Math.random() * 100 + 'vh';
+            confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+            const sizeBase = Math.random() * 8 + 4; 
+            confetti.style.width = sizeBase + 'px';
+            confetti.style.height = (Math.random() > 0.5 ? sizeBase : sizeBase * 1.5) + 'px';
+            confetti.style.opacity = Math.random() * 0.5 + 0.5;
+            confettiContainer.appendChild(confetti);
+        }
+    });
+  </script>
+
+</body>
+</html>
