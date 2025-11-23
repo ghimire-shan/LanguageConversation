@@ -119,7 +119,6 @@
         filter: blur(4px);
       }
 
-      /* Simple hide utility for practice states */
       .hidden {
         display: none;
       }
@@ -267,7 +266,7 @@
       .transcript-box {
         flex: 1;
         background-color: var(--bg-color);
-        border-radius: var(--radius-md);
+        border-radius: 18px;
         padding: 1.5rem;
         margin-bottom: 1.5rem;
         display: flex;
@@ -278,13 +277,27 @@
       .app-card:hover .transcript-box {
         border-color: #cbd5e1;
       }
-      .translation-bubble {
-        background-color: var(--accent-teal);
-        color: white;
-        font-weight: 700;
+
+      /* --- CHAT BUBBLES (shared) --- */
+      .chat-bubble {
+        max-width: 80%;
         padding: 0.75rem 1rem;
         border-radius: 1rem;
-        box-shadow: var(--shadow-sm);
+        font-size: 0.95rem;
+        line-height: 1.4;
+        box-shadow: var(--shadow-md);
+      }
+      .chat-bubble.user-bubble {
+        margin-left: auto;
+        background-color: #ffffff;
+        color: var(--text-primary);
+        border: 1px solid var(--border-light);
+      }
+      .chat-bubble.ai-bubble {
+        margin-right: auto;
+        background-color: var(--accent-teal);
+        color: #ffffff;
+        font-weight: 600;
       }
 
       /* Bottom Nav Specifics */
@@ -349,7 +362,7 @@
       }
     </style>
   </head>
-  <body class="h-full overflow-hidden bg-[#F8FAFC] mode-conversation">
+  <body class="h-full overflow-hidden bg-[#F8FAFC] mode-practice">
     <div id="confetti-container"></div>
 
     <div
@@ -366,7 +379,8 @@
     </div>
 
     <main class="relative h-full w-full overflow-hidden pb-28">
-      <div id="conversation-view" class="view-container active-view">
+      <!-- PRACTICE VIEW (language conversion) -->
+      <div id="practice-view" class="view-container active-view">
         <header
           class="flex items-center justify-between mb-6 max-w 1000px mx-auto stagger-1 relative z-20"
         >
@@ -411,11 +425,12 @@
         </header>
 
         <div class="main-layout-grid">
+          <!-- LEFT CARD: Practice Mode Controls -->
           <section class="app-card card-centered md:max-h-[80vh] stagger-2">
             <h1
               class="text-2xl md:text-3xl font-bold text-slate-800 mb-2 tracking-tight"
             >
-              Conversation Mode
+              Practice Mode
             </h1>
             <p class="text-base text-slate-500 font-medium mb-8">
               Tap the mic to start speaking.
@@ -424,11 +439,200 @@
             <div
               class="w-full max-w-xs flex flex-col gap-4 items-center relative z-10 mb-2"
             >
+              <!-- DROPDOWN 1: LANGUAGE (KEEPING YOUR FLAG + NAME SETUP) -->
               <div
                 class="w-full flex items-center justify-center bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm transition-colors hover:border-blue-200 relative"
               >
                 <select
-                  id="conv-lang-select"
+                  id="practice-lang-select"
+                  class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                >
+                  <option value="es">Spanish</option>
+                  <option value="fr">French</option>
+                </select>
+                <div
+                  class="flex items-center gap-2 text-blue-600 pointer-events-none z-10"
+                >
+                  <span class="text-slate-500 font-medium text-sm mr-1"
+                    >Language:</span
+                  >
+                  <img
+                    id="practice-lang-flag"
+                    src="https://flagicons.lipis.dev/flags/4x3/es.svg"
+                    alt="Target Flag"
+                    class="w-5 h-4 object-cover rounded-sm shadow-sm"
+                  />
+                  <span id="practice-lang-name" class="font-bold text-sm"
+                    >Spanish</span
+                  >
+                  <i class="ph-bold ph-caret-down"></i>
+                </div>
+              </div>
+
+              <!-- DROPDOWN 2: MODEL (VARIABLE 1 / VARIABLE 2) -->
+              <div
+                class="w-full bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm transition-colors hover:border-blue-200"
+              >
+                <label
+                  for="practice-model-select"
+                  class="block text-slate-500 font-medium text-xs mb-1"
+                >
+                  Model
+                </label>
+                <div class="flex items-center justify-between">
+                  <select
+                    id="practice-model-select"
+                    class="bg-transparent text-sm font-bold text-slate-700 outline-none flex-1 cursor-pointer"
+                  >
+                    <option value="03397b4c4be74759b72533b663fbd001">
+                      Energetic Male
+                    </option>
+                    <option value="728f6ff2240d49308e8137ffe66008e2">
+                      Adam
+                    </option>
+                    <option value="e0e2468ce2d746c1b20a4414435f6f48">
+                      Bro
+                    </option>
+                  </select>
+                  <i class="ph-bold ph-caret-down text-slate-400 ml-2"></i>
+                </div>
+              </div>
+
+              <!-- MIC BUTTON -->
+              <button id="practice-mic-btn" class="mic-button group">
+                <i
+                  id="practice-mic-icon"
+                  class="ph-fill ph-microphone text-2xl transition-all"
+                ></i>
+                <div class="text-left">
+                  <span id="practice-mic-text" class="block font-bold text-lg"
+                    >Tap to speak</span
+                  >
+                  <span
+                    id="practice-mic-subtext"
+                    class="block text-xs opacity-70"
+                    >Ready</span
+                  >
+                </div>
+              </button>
+
+              <!-- VOICE BARS -->
+              <div
+                id="practice-voice-bars"
+                class="mt-2 h-10 flex items-center justify-center gap-1.5"
+              >
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+              </div>
+            </div>
+          </section>
+          <!-- RIGHT CARD: Conversation Transcript -->
+          <section class="app-card md:max-h-[80vh]">
+            <div class="mb-4 flex items-center justify-between">
+              <div>
+                <h2 class="text-xl font-bold text-slate-800 tracking-tight">
+                  Conversation Transcript
+                </h2>
+                <p class="text-xs text-slate-400 font-medium">
+                  You (white) · AI (green)
+                </p>
+              </div>
+              <i
+                class="ph-bold ph-trash text-slate-400 text-xl cursor-pointer hover:text-red-500 transition-colors p-2 tactile-touch"
+                id="practice-clear-btn"
+              ></i>
+            </div>
+
+            <div class="flex-1 flex flex-col overflow-hidden">
+              <div class="transcript-box mb-0">
+                <span
+                  class="text-xs font-bold text-slate-500 tracking-wider mb-4 block"
+                  >SESSION</span
+                >
+                <div
+                  id="practice-chat-history"
+                  class="flex-1 overflow-y-auto flex flex-col gap-3"
+                  style="max-height: 100%"
+                >
+                  <p class="text-slate-400 italic text-center px-8">
+                    Messages here...
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <!-- CONVERSATION VIEW (back and forth conversation) -->
+      <div id="conversation-view" class="view-container hidden-view">
+        <header
+          class="flex items-center justify-between mb-6 max-w 1000px mx-auto stagger-1 relative z-20"
+        >
+          <div class="avatar-container relative">
+            <div class="avatar"><i class="ph-bold ph-user-circle"></i></div>
+            <div
+              class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-[2px] border-white animate-pulse"
+            ></div>
+          </div>
+          <div
+            class="flex items-center gap-3 bg-white/80 backdrop-blur-sm p-2 rounded-2xl shadow-sm border border-blue-100/50"
+          >
+            <div
+              class="flex items-center gap-1 text-orange-500 font-bold text-sm px-2"
+            >
+              <i class="ph-fill ph-fire text-lg"></i> 3 Day Streak
+            </div>
+            <div class="w-8 h-8 relative flex items-center justify-center">
+              <svg class="w-full h-full rotate-[-90deg]" viewBox="0 0 36 36">
+                <path
+                  class="text-slate-200"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="3"
+                />
+                <path
+                  class="text-blue-500"
+                  stroke-dasharray="75, 100"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                />
+              </svg>
+              <span class="absolute text-[10px] font-bold text-blue-600"
+                >75%</span
+              >
+            </div>
+          </div>
+        </header>
+
+        <div class="main-layout-grid">
+          <!-- LEFT CARD: Conversation Mode Controls -->
+          <section class="app-card card-centered md:max-h-[80vh] stagger-2">
+            <h1
+              class="text-2xl md:text-3xl font-bold text-slate-800 mb-2 tracking-tight"
+            >
+              Conversation Mode
+            </h1>
+            <p class="text-base text-slate-500 font-medium mb-8">
+              Have a conversation with AI in your target language.
+            </p>
+
+            <div
+              class="w-full max-w-xs flex flex-col gap-4 items-center relative z-10 mb-2"
+            >
+              <!-- LANGUAGE SELECTOR -->
+              <div
+                class="w-full flex items-center justify-center bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm transition-colors hover:border-blue-200 relative"
+              >
+                <select
+                  id="conversation-lang-select"
                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
                 >
                   <option value="es">Spanish</option>
@@ -441,35 +645,41 @@
                     >Talk in:</span
                   >
                   <img
-                    id="target-lang-flag"
+                    id="conversation-lang-flag"
                     src="https://flagicons.lipis.dev/flags/4x3/es.svg"
                     alt="Target Flag"
                     class="w-5 h-4 object-cover rounded-sm shadow-sm"
                   />
-                  <span id="target-lang-name" class="font-bold text-sm"
+                  <span id="conversation-lang-name" class="font-bold text-sm"
                     >Spanish</span
                   >
                   <i class="ph-bold ph-caret-down"></i>
                 </div>
               </div>
 
-              <button id="conv-mic-btn" class="mic-button group">
+              <!-- MIC BUTTON -->
+              <button id="conversation-mic-btn" class="mic-button group">
                 <i
-                  id="conv-mic-icon"
+                  id="conversation-mic-icon"
                   class="ph-fill ph-microphone text-2xl transition-all"
                 ></i>
                 <div class="text-left">
-                  <span id="conv-mic-text" class="block font-bold text-lg"
+                  <span
+                    id="conversation-mic-text"
+                    class="block font-bold text-lg"
                     >Tap to speak</span
                   >
-                  <span id="conv-mic-subtext" class="block text-xs opacity-70"
-                    >Tap and talk</span
+                  <span
+                    id="conversation-mic-subtext"
+                    class="block text-xs opacity-70"
+                    >Ready</span
                   >
                 </div>
               </button>
 
+              <!-- VOICE BARS -->
               <div
-                id="conv-voice-bars"
+                id="conversation-voice-bars"
                 class="mt-2 h-10 flex items-center justify-center gap-1.5"
               >
                 <div class="voice-bar"></div>
@@ -481,46 +691,36 @@
             </div>
           </section>
 
-          <section class="app-card md:max-h-[80vh] stagger-3">
+          <!-- RIGHT CARD: Conversation Chat -->
+          <section class="app-card md:max-h-[80vh]">
             <div class="mb-4 flex items-center justify-between">
               <div>
                 <h2 class="text-xl font-bold text-slate-800 tracking-tight">
-                  Live Transcript
+                  Conversation
                 </h2>
+                <p class="text-xs text-slate-400 font-medium">
+                  You (white) · AI (green)
+                </p>
               </div>
               <i
                 class="ph-bold ph-trash text-slate-400 text-xl cursor-pointer hover:text-red-500 transition-colors p-2 tactile-touch"
-                id="conv-clear-btn"
+                id="conversation-chat-clear-btn"
               ></i>
             </div>
 
-            <div class="flex-1 flex flex-col gap-4 overflow-hidden">
-              <div class="transcript-box">
+            <div class="flex-1 flex flex-col overflow-hidden min-h-0">
+              <div class="transcript-box mb-0 min-h-0">
                 <span
                   class="text-xs font-bold text-slate-500 tracking-wider mb-4 block"
-                  >YOU SAID</span
                 >
+                  CHAT
+                </span>
                 <div
-                  id="history-source"
-                  class="flex-1 overflow-y-auto no-scrollbar flex flex-col justify-center gap-3"
+                  id="conversation-chat-container"
+                  class="flex-1 overflow-y-auto flex flex-col gap-3 h-full"
                 >
                   <p class="text-slate-400 italic text-center px-8">
-                    Your speech will appear here...
-                  </p>
-                </div>
-              </div>
-              <div class="transcript-box mb-0">
-                <span
-                  id="target-translation-label"
-                  class="text-xs font-bold text-green-600 tracking-wider mb-4 block"
-                  >CORRECT (SPANISH)</span
-                >
-                <div
-                  id="history-target"
-                  class="flex-1 overflow-y-auto no-scrollbar flex flex-col justify-center gap-3"
-                >
-                  <p class="text-green-600/50 italic text-center px-8">
-                    ...and the correction will appear here.
+                    Your conversation will appear here...
                   </p>
                 </div>
               </div>
@@ -529,171 +729,7 @@
         </div>
       </div>
 
-      <div id="practice-view" class="view-container hidden-view">
-        <header
-          class="flex items-center justify-between mb-6 max-w 1000px mx-auto relative z-20"
-        >
-          <div class="avatar-container relative">
-            <div class="avatar"><i class="ph-bold ph-user-circle"></i></div>
-          </div>
-          <h2 class="text-xl font-bold text-slate-800 tracking-tight">
-            Practice Mode
-          </h2>
-        </header>
-
-        <div class="main-layout-grid items-center">
-          <section
-            class="app-card card-centered max-w-3xl mx-auto md:max-h-[80vh]"
-          >
-            <div class="mb-6">
-              <div
-                class="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 mx-auto mb-4 shadow-sm border border-indigo-50"
-              >
-                <i class="ph-fill ph-speaker-high text-3xl"></i>
-              </div>
-              <h2 class="text-3xl font-bold text-slate-800 mb-2 tracking-tight">
-                Select a Voice Partner
-              </h2>
-              <p class="text-base text-slate-500 font-medium">
-                Choose who you want to practice with.
-              </p>
-            </div>
-
-            <div
-              id="practice-input-state"
-              class="w-full max-w-lg flex flex-col gap-6 items-center transition-all duration-500"
-            >
-              <div class="w-full mb-4 relative z-20">
-                <div
-                  class="w-full flex items-center justify-between bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-sm transition-all hover:border-indigo-300 hover:shadow-md cursor-pointer relative"
-                >
-                  <span
-                    id="selected-voice-display"
-                    class="font-bold text-indigo-700 flex items-center gap-2"
-                  >
-                    <i class="ph-fill ph-user"></i> Your Own Voice
-                  </span>
-                  <i class="ph-bold ph-caret-down text-indigo-500"></i>
-                  <select
-                    id="practice-voice-select"
-                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-                  >
-                    <option value="own_voice">Your Own Voice</option>
-                    <option value="trump">Donald Trump</option>
-                    <option value="ronaldo">Cristiano Ronaldo</option>
-                    <option value="spongebob">SpongeBob SquarePants</option>
-                    <option value="biden">Joe Biden</option>
-                  </select>
-                </div>
-              </div>
-
-              <button
-                id="prac-mic-btn"
-                class="mic-button bg-indigo-600 hover:bg-indigo-700 text-white"
-              >
-                <i
-                  id="prac-mic-icon"
-                  class="ph-fill ph-chats-circle text-3xl transition-all"
-                ></i>
-                <div class="text-left">
-                  <span class="block font-bold text-2xl"
-                    >Start Talking with AI</span
-                  >
-                  <span class="block text-sm opacity-80 tracking-wider"
-                    >Tap to begin session</span
-                  >
-                </div>
-              </button>
-            </div>
-
-            <div
-              id="practice-results-state"
-              class="hidden w-full flex flex-col gap-6 transition-all duration-500 animate-in fade-in slide-in-from-bottom-4"
-            >
-              <div class="flex-1 flex flex-col md:flex-row gap-4 items-stretch">
-                <div
-                  class="flex-1 bg-slate-50 rounded-2xl p-5 border border-slate-200 text-left flex flex-col shadow-sm"
-                >
-                  <h3
-                    class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3"
-                  >
-                    1. What we heard
-                  </h3>
-                  <div
-                    class="flex-1 bg-white rounded-xl p-4 flex flex-col items-center justify-center shadow-sm border border-slate-100 gap-3"
-                  >
-                    <p
-                      class="text-lg font-bold text-slate-700 text-center leading-tight"
-                    >
-                      "Buenos dias amigo"
-                    </p>
-                    <button
-                      class="tactile-touch flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-full font-bold transition-colors text-xs"
-                    >
-                      <i class="ph-bold ph-play"></i> Play back
-                    </button>
-                  </div>
-                </div>
-                <div
-                  class="flex-1 bg-amber-50 rounded-2xl p-5 border border-amber-200 text-left flex flex-col shadow-sm"
-                >
-                  <h3
-                    class="text-xs font-bold text-amber-600 uppercase tracking-widest mb-3"
-                  >
-                    2. Analysis
-                  </h3>
-                  <div
-                    class="flex-1 bg-white rounded-xl p-4 flex flex-col items-center justify-center shadow-sm gap-3 border border-amber-100"
-                  >
-                    <div class="flex items-center gap-2">
-                      <span class="text-amber-600 font-bold text-base"
-                        >Score:</span
-                      ><span class="font-black text-3xl text-amber-500"
-                        >85%</span
-                      >
-                    </div>
-                    <p
-                      class="text-sm font-bold text-amber-800 text-center bg-amber-100 px-4 py-2 rounded-xl leading-tight"
-                    >
-                      Don't forget the accent on "días".
-                    </p>
-                  </div>
-                </div>
-                <div
-                  class="flex-1 bg-emerald-50 rounded-2xl p-5 border border-emerald-200 text-left flex flex-col shadow-sm"
-                >
-                  <h3
-                    class="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-3"
-                  >
-                    3. The Correct Way
-                  </h3>
-                  <div
-                    class="flex-1 bg-white rounded-xl p-4 flex flex-col items-center justify-center shadow-sm gap-3 border border-emerald-100"
-                  >
-                    <p
-                      class="text-xl font-black text-emerald-700 text-center leading-tight"
-                    >
-                      "Buenos días, amigo."
-                    </p>
-                    <button
-                      class="tactile-touch flex items-center gap-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-4 py-2 rounded-full font-bold transition-colors text-sm"
-                    >
-                      <i class="ph-bold ph-speaker-high"></i> Listen
-                    </button>
-                  </div>
-                </div>
-              </div>
-              <button
-                id="prac-reset-btn"
-                class="tactile-touch w-full py-3 bg-white border-2 border-indigo-100 text-indigo-600 rounded-full font-bold text-lg hover:bg-indigo-50 transition-all shadow-sm"
-              >
-                Try another practice session
-              </button>
-            </div>
-          </section>
-        </div>
-      </div>
-
+      <!-- CLONE VIEW -->
       <div id="clone-view" class="view-container hidden-view">
         <header
           class="flex items-center justify-between mb-6 max-w 1000px mx-auto relative z-20"
@@ -774,8 +810,8 @@
 
     <div class="bottom-nav-container stagger-4">
       <div class="bottom-nav">
-        <div id="nav-conv-btn" class="nav-button active">Conversation</div>
-        <div id="nav-prac-btn" class="nav-button inactive">Practice</div>
+        <div id="nav-conv-btn" class="nav-button active">Practice</div>
+        <div id="nav-prac-btn" class="nav-button inactive">Conversation</div>
         <div id="nav-clone-btn" class="nav-button inactive">Clone Voice</div>
       </div>
     </div>
@@ -808,8 +844,8 @@
         const navPracBtn = document.getElementById("nav-prac-btn");
         const navCloneBtn = document.getElementById("nav-clone-btn");
 
-        const conversationView = document.getElementById("conversation-view");
         const practiceView = document.getElementById("practice-view");
+        const conversationView = document.getElementById("conversation-view");
         const cloneView = document.getElementById("clone-view");
 
         function resetViews() {
@@ -817,7 +853,7 @@
             btn.classList.remove("active");
             btn.classList.add("inactive");
           });
-          [conversationView, practiceView, cloneView].forEach((view) => {
+          [practiceView, conversationView, cloneView].forEach((view) => {
             view.classList.remove("active-view");
             view.classList.add("hidden-view");
           });
@@ -830,20 +866,20 @@
 
         navConvBtn.addEventListener("click", () => {
           resetViews();
-          document.body.classList.add("mode-conversation");
+          document.body.classList.add("mode-practice");
           navConvBtn.classList.add("active");
           navConvBtn.classList.remove("inactive");
-          conversationView.classList.add("active-view");
-          conversationView.classList.remove("hidden-view");
+          practiceView.classList.add("active-view");
+          practiceView.classList.remove("hidden-view");
         });
 
         navPracBtn.addEventListener("click", () => {
           resetViews();
-          document.body.classList.add("mode-practice");
+          document.body.classList.add("mode-conversation");
           navPracBtn.classList.add("active");
           navPracBtn.classList.remove("inactive");
-          practiceView.classList.add("active-view");
-          practiceView.classList.remove("hidden-view");
+          conversationView.classList.add("active-view");
+          conversationView.classList.remove("hidden-view");
         });
 
         navCloneBtn.addEventListener("click", () => {
@@ -855,231 +891,105 @@
           cloneView.classList.remove("hidden-view");
         });
 
-        // ================= PRACTICE MODE LOGIC =================
-        const practiceVoiceSelect = document.getElementById(
-          "practice-voice-select"
-        );
-        const selectedVoiceDisplay = document.getElementById(
-          "selected-voice-display"
-        );
-        const practiceInputState = document.getElementById(
-          "practice-input-state"
-        );
-        const practiceResultsState = document.getElementById(
-          "practice-results-state"
-        );
-        const pracMicBtn = document.getElementById("prac-mic-btn");
-        const pracResetBtn = document.getElementById("prac-reset-btn");
-
-        practiceVoiceSelect.addEventListener("change", function () {
-          const selectedText = this.options[this.selectedIndex].text;
-          let iconClass = "ph-user";
-          if (this.value === "trump" || this.value === "biden")
-            iconClass = "ph-user-focus";
-          if (this.value === "ronaldo") iconClass = "ph-soccer-ball";
-          if (this.value === "spongebob") iconClass = "ph-smiley";
-          selectedVoiceDisplay.innerHTML = `<i class="ph-fill ${iconClass}"></i> ${selectedText}`;
-        });
-
-        pracMicBtn.addEventListener("click", () => {
-          pracMicBtn.innerHTML =
-            '<i class="ph-bold ph-spinner animate-spin text-3xl"></i><div class="text-left"><span class="block font-bold text-2xl">Connecting...</span><span class="block text-sm opacity-80 tracking-wider">Please wait</span></div>';
-          setTimeout(() => {
-            practiceInputState.classList.add("hidden");
-            practiceResultsState.classList.remove("hidden");
-            pracMicBtn.innerHTML =
-              '<i id="prac-mic-icon" class="ph-fill ph-chats-circle text-3xl transition-all"></i><div class="text-left"><span class="block font-bold text-2xl">Start Talking with AI</span><span class="block text-sm opacity-80 tracking-wider">Tap to begin session</span></div>';
-          }, 1500);
-        });
-
-        pracResetBtn.addEventListener("click", () => {
-          practiceResultsState.classList.add("hidden");
-          practiceInputState.classList.remove("hidden");
-        });
-
-        // ================= CLONE MODE LOGIC (NEW) =================
-        const cloneRecordBtn = document.getElementById("clone-record-btn");
-        const cloneDeleteBtn = document.getElementById("clone-delete-btn"); // still UI-only for now
-
-        let cloneMediaRecorder = null;
-        let cloneAudioChunks = [];
-        let cloneStream = null;
-        let isCloneRecording = false;
-        let isCloneUploading = false;
-
-        async function uploadCloneAudio(audioBlob) {
-          try {
-            isCloneUploading = true;
-            // Update button to show upload state
-            cloneRecordBtn.disabled = true;
-            cloneRecordBtn.classList.add("opacity-70", "cursor-not-allowed");
-            cloneRecordBtn.innerHTML = `
-                <i class="ph-bold ph-cloud-arrow-up text-3xl animate-bounce"></i>
-                <div class="text-left">
-                    <span class="block font-bold text-2xl">Uploading sample...</span>
-                    <span class="block text-sm opacity-80 tracking-wider">This may take a moment</span>
-                </div>
-            `;
-
-            const formData = new FormData();
-            formData.append("file", audioBlob, "voice_sample.webm");
-
-            // Required by backend: voice_name: str = Form(...)
-            // You can later replace this with a real text input.
-            formData.append("voice_name", "My Voice");
-
-            const response = await fetch(
-              "http://localhost:8000/api/create_clone",
-              {
-                method: "POST",
-                body: formData, // send cookies for get_current_user (if same-origin)
-              }
-            );
-
-            if (!response.ok) {
-              const errText = await response.text().catch(() => "");
-              console.error(
-                "Error from /api/create_clone:",
-                response.status,
-                errText
-              );
-              alert(
-                "Error creating/updating voice clone. Check the console for details."
-              );
-              return;
-            }
-
-            const result = await response.json();
-            console.log("Clone created/updated:", result);
-
-            alert(
-              result.message || "Voice clone created/updated successfully!"
-            );
-            if (result.voice_id) {
-              localStorage.setItem("voice_id", result.voice_id);
-            }
-          } catch (err) {
-            console.error("Upload clone failed:", err);
-            alert("Failed to upload voice sample. Please try again.");
-          } finally {
-            isCloneUploading = false;
-            cloneRecordBtn.disabled = false;
-            cloneRecordBtn.classList.remove("opacity-70", "cursor-not-allowed");
-            // Restore default button content
-            cloneRecordBtn.innerHTML = `
-                <i class="ph-fill ph-microphone text-3xl"></i>
-                <div class="text-left">
-                    <span class="block font-bold text-2xl">Record Sample</span>
-                    <span class="block text-sm opacity-80 tracking-wider">Tap and hold</span>
-                </div>
-            `;
-          }
+        // ========== SHARED HELPERS FOR CHAT BUBBLES ==========
+        function createUserBubble(text) {
+          const bubble = document.createElement("div");
+          bubble.className =
+            "chat-bubble bg-white text-slate-800 self-start rounded-2xl";
+          bubble.textContent = text;
+          return bubble;
         }
 
-        async function handleCloneRecordClick() {
-          if (isCloneUploading) {
-            return; // ignore clicks while upload is in progress
+        function createAiBubble(text, audioBase64 = null) {
+          const bubble = document.createElement("div");
+          bubble.className =
+            "chat-bubble bg-gradient-to-br from-blue-500 to-teal-500 text-white self-end rounded-2xl";
+
+          const textDiv = document.createElement("div");
+          textDiv.textContent = text;
+          bubble.appendChild(textDiv);
+
+          // Add play button if audio is provided
+          if (audioBase64) {
+            const playButton = createAudioPlayButton(audioBase64);
+            bubble.appendChild(playButton);
           }
 
-          // Toggle recording
-          isCloneRecording = !isCloneRecording;
+          return bubble;
+        }
 
-          if (isCloneRecording) {
-            // START recording
-            try {
-              cloneStream = await navigator.mediaDevices.getUserMedia({
-                audio: true,
-              });
-              cloneAudioChunks = [];
+        function createAudioPlayButton(audioBase64) {
+          const button = document.createElement("button");
+          button.className =
+            "mt-2 flex items-center gap-2 px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded-full text-xs font-bold transition-colors";
+          button.innerHTML = '<i class="ph-bold ph-play"></i> Play Audio';
 
-              cloneMediaRecorder = new MediaRecorder(cloneStream, {
-                mimeType: "audio/webm",
-              });
+          let audioUrl = null;
+          let audio = null;
 
-              cloneMediaRecorder.ondataavailable = (e) => {
-                if (e.data && e.data.size > 0) {
-                  cloneAudioChunks.push(e.data);
-                }
-              };
-
-              cloneMediaRecorder.start();
-
-              // UI updates for recording state
-              cloneRecordBtn.innerHTML = `
-                    <i class="ph-bold ph-waveform text-3xl animate-pulse"></i>
-                    <div class="text-left">
-                        <span class="block font-bold text-2xl">Recording...</span>
-                        <span class="block text-sm opacity-80 tracking-wider">Speak clearly for ~15 seconds</span>
-                    </div>
-                `;
-            } catch (err) {
-              console.error("Clone MIC ERROR:", err);
-              alert("Microphone blocked for clone. Check browser permissions.");
-              isCloneRecording = false;
-            }
-          } else {
-            // STOP recording
-            if (!cloneMediaRecorder) return;
-
-            cloneMediaRecorder.stop();
-
-            cloneMediaRecorder.onstop = async () => {
-              try {
-                const audioBlob = new Blob(cloneAudioChunks, {
-                  type: "audio/webm",
-                });
-
-                if (cloneStream) {
-                  cloneStream.getTracks().forEach((t) => t.stop());
-                }
-
-                console.log("Clone sample blob:", audioBlob);
-                await uploadCloneAudio(audioBlob);
-              } catch (err) {
-                console.error("Error after stopping clone recorder:", err);
-              } finally {
-                cloneMediaRecorder = null;
-                cloneStream = null;
-                cloneAudioChunks = [];
+          button.addEventListener("click", () => {
+            if (!audioUrl) {
+              // Convert base64 to audio URL
+              const audioData = atob(audioBase64);
+              const audioArray = new Uint8Array(audioData.length);
+              for (let i = 0; i < audioData.length; i++) {
+                audioArray[i] = audioData.charCodeAt(i);
               }
+              const audioBlob = new Blob([audioArray], { type: "audio/wav" });
+              audioUrl = URL.createObjectURL(audioBlob);
+            }
+
+            // Stop any currently playing audio
+            if (audio) {
+              audio.pause();
+              audio.currentTime = 0;
+            }
+
+            // Play audio
+            audio = new Audio(audioUrl);
+            audio.play();
+
+            // Update button while playing
+            button.innerHTML = '<i class="ph-bold ph-pause"></i> Playing...';
+            button.disabled = true;
+
+            audio.onended = () => {
+              button.innerHTML = '<i class="ph-bold ph-play"></i> Play Audio';
+              button.disabled = false;
             };
 
-            // While we're waiting for onstop/upload, keep simple text
-            cloneRecordBtn.innerHTML = `
-                <i class="ph-bold ph-waveform text-3xl"></i>
-                <div class="text-left">
-                    <span class="block font-bold text-2xl">Processing sample...</span>
-                    <span class="block text-sm opacity-80 tracking-wider">Please wait</span>
-                </div>
-            `;
-          }
+            audio.onerror = () => {
+              button.innerHTML = '<i class="ph-bold ph-play"></i> Play Audio';
+              button.disabled = false;
+            };
+          });
+
+          return button;
         }
 
-        cloneRecordBtn.addEventListener("click", handleCloneRecordClick);
-
-        // (optional) Delete button still just UI placeholder
-        cloneDeleteBtn.addEventListener("click", () => {
-          alert("Delete voice model endpoint not wired yet.");
-        });
-
-        // ================= CONVERSATION MODE LOGIC =================
-        const convMicBtn = document.getElementById("conv-mic-btn");
-        const convMicIcon = document.getElementById("conv-mic-icon");
-        const convMicText = document.getElementById("conv-mic-text");
-        const convMicSubtext = document.getElementById("conv-mic-subtext");
-        const convVoiceBars = document.getElementById("conv-voice-bars");
-        const convClearBtn = document.getElementById("conv-clear-btn");
-        const historySource = document.getElementById("history-source");
-        const historyTarget = document.getElementById("history-target");
-        const convLangSelect = document.getElementById("conv-lang-select");
-        const targetTranslationLabel = document.getElementById(
-          "target-translation-label"
+        // ================= PRACTICE MODE (language conversion) =================
+        const practiceMicBtn = document.getElementById("practice-mic-btn");
+        const practiceMicIcon = document.getElementById("practice-mic-icon");
+        const practiceMicText = document.getElementById("practice-mic-text");
+        const practiceMicSubtext = document.getElementById(
+          "practice-mic-subtext"
         );
-        const targetLangFlag = document.getElementById("target-lang-flag");
-        const targetLangNameSpan = document.getElementById("target-lang-name");
+        const practiceVoiceBars = document.getElementById(
+          "practice-voice-bars"
+        );
+        const practiceClearBtn = document.getElementById("practice-clear-btn");
+        const practiceLangSelect = document.getElementById(
+          "practice-lang-select"
+        );
+        const practiceLangFlag = document.getElementById("practice-lang-flag");
+        const practiceLangNameSpan =
+          document.getElementById("practice-lang-name");
+        const practiceChatHistory = document.getElementById(
+          "practice-chat-history"
+        );
 
-        function updateConvLanguageUI() {
-          const selectedLangCode = convLangSelect.value;
+        function updatePracticeLanguageUI() {
+          const selectedLangCode = practiceLangSelect.value;
           let flagUrl = "";
           let langName = "";
 
@@ -1091,17 +1001,471 @@
             langName = "French";
           }
 
-          targetLangFlag.src = flagUrl;
-          targetLangFlag.alt = `${langName} Flag`;
-          targetLangNameSpan.textContent = langName;
-          targetTranslationLabel.textContent = `CORRECT (${langName.toUpperCase()})`;
+          practiceLangFlag.src = flagUrl;
+          practiceLangFlag.alt = `${langName} Flag`;
+          practiceLangNameSpan.textContent = langName;
         }
 
-        convLangSelect.addEventListener("change", updateConvLanguageUI);
+        practiceLangSelect.addEventListener("change", updatePracticeLanguageUI);
 
+        // CHAT HISTORY MANAGEMENT FOR PRACTICE MODE
+        function getChatHistory() {
+          const stored = sessionStorage.getItem("practice_history");
+          return stored ? JSON.parse(stored) : [];
+        }
+
+        function saveChatHistory(history) {
+          sessionStorage.setItem("practice_history", JSON.stringify(history));
+        }
+
+        function addMessageToHistory(role, content) {
+          const history = getChatHistory();
+          history.push({ role, content });
+          if (history.length > 20) {
+            history.shift();
+          }
+          saveChatHistory(history);
+        }
+
+        // PRACTICE MODE: Record and send to backend
+        let isPracticeMicActive = false;
+        let practiceMediaRecorder = null;
+        let practiceAudioChunks = [];
+        let practiceStream = null;
+
+        async function handlePracticeMicToggle() {
+          isPracticeMicActive = !isPracticeMicActive;
+
+          if (isPracticeMicActive) {
+            // Start recording
+            try {
+              practiceStream = await navigator.mediaDevices.getUserMedia({
+                audio: true,
+              });
+              practiceAudioChunks = [];
+              practiceMediaRecorder = new MediaRecorder(practiceStream, {
+                mimeType: "audio/webm",
+              });
+
+              practiceMediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) {
+                  practiceAudioChunks.push(e.data);
+                }
+              };
+
+              practiceMediaRecorder.start();
+
+              // UI updates
+              practiceMicBtn.classList.add("active-state");
+              practiceMicIcon.classList.remove("ph-microphone");
+              practiceMicIcon.classList.add("ph-waveform", "animate-pulse");
+              practiceMicText.textContent = "Listening...";
+              practiceMicSubtext.textContent = "Speak clearly";
+              practiceVoiceBars.classList.add("animate-voice");
+            } catch (err) {
+              console.error("MIC ERROR:", err);
+              alert("Microphone blocked. Check browser permissions.");
+              isPracticeMicActive = false;
+            }
+          } else {
+            // Stop recording and send to backend
+            if (
+              practiceMediaRecorder &&
+              practiceMediaRecorder.state !== "inactive"
+            ) {
+              practiceMediaRecorder.stop();
+            }
+
+            practiceMediaRecorder.onstop = async () => {
+              const audioBlob = new Blob(practiceAudioChunks, {
+                type: "audio/webm",
+              });
+
+              // Stop audio stream
+              if (practiceStream) {
+                practiceStream.getTracks().forEach((track) => track.stop());
+              }
+
+              // Send to backend
+              await sendPracticeAudioToBackend(audioBlob);
+            };
+
+            // UI back to normal
+            practiceMicBtn.classList.remove("active-state");
+            practiceMicIcon.classList.remove("ph-waveform", "animate-pulse");
+            practiceMicIcon.classList.add("ph-microphone");
+            practiceMicText.textContent = "Tap to speak";
+            practiceMicSubtext.textContent = "Processing...";
+            practiceVoiceBars.classList.remove("animate-voice");
+          }
+        }
+
+        async function sendPracticeAudioToBackend(audioBlob) {
+          try {
+            const formData = new FormData();
+            formData.append("file", audioBlob, "audio.webm");
+
+            // Get target language and model ID
+            const targetLang = practiceLangSelect.value;
+            const modelId =
+              document.getElementById("practice-model-select").value ||
+              localStorage.getItem("user_voice_model_id") ||
+              "03397b4c4be74759b72533b663fbd001";
+
+            formData.append("target_lang", targetLang);
+            formData.append("model_id", modelId);
+
+            // Clear placeholder if present
+            const placeholder =
+              practiceChatHistory.querySelector("p.text-slate-400");
+            if (placeholder) {
+              practiceChatHistory.innerHTML = "";
+            }
+
+            const response = await fetch("http://localhost:8000/api/practice", {
+              method: "POST",
+              body: formData,
+            });
+
+            if (!response.ok) {
+              const errorData = await response
+                .json()
+                .catch(() => ({ detail: `Server error: ${response.status}` }));
+              throw new Error(
+                errorData.detail || `Server error: ${response.status}`
+              );
+            }
+
+            const result = await response.json();
+
+            // Display user message (original transcription - we'll show corrected text as user said it)
+            const userBubbleFinal = createUserBubble(
+              result.initial_text || "Processing..."
+            );
+            practiceChatHistory.appendChild(userBubbleFinal);
+            practiceChatHistory.scrollTop = practiceChatHistory.scrollHeight;
+
+            // Display AI reply (corrected text) with audio play button
+            const aiBubble = createAiBubble(
+              result.corrected_text || "Processing...",
+              result.audio_base64 || null
+            );
+            practiceChatHistory.appendChild(aiBubble);
+            practiceChatHistory.scrollTop = practiceChatHistory.scrollHeight;
+
+            // Auto-play audio if available (user can replay using the button)
+            if (result.audio_base64) {
+              const audioData = atob(result.audio_base64);
+              const audioArray = new Uint8Array(audioData.length);
+              for (let i = 0; i < audioData.length; i++) {
+                audioArray[i] = audioData.charCodeAt(i);
+              }
+              const audioBlob = new Blob([audioArray], { type: "audio/wav" });
+              const audioUrl = URL.createObjectURL(audioBlob);
+              const audio = new Audio(audioUrl);
+              audio.play();
+              audio.onended = () => URL.revokeObjectURL(audioUrl);
+            }
+
+            // Update UI
+            practiceMicSubtext.textContent = "Ready to speak";
+          } catch (err) {
+            console.error("Upload failed:", err);
+            alert(`Error: ${err.message}`);
+            practiceMicSubtext.textContent = "Error - try again";
+          }
+        }
+
+        practiceMicBtn.addEventListener("click", handlePracticeMicToggle);
+
+        if (practiceClearBtn) {
+          practiceClearBtn.addEventListener("click", () => {
+            practiceChatHistory.innerHTML = `
+              <p class="text-slate-400 italic text-center px-8">
+                Messages here...
+              </p>
+            `;
+            sessionStorage.removeItem("practice_history");
+          });
+        }
+
+        // Initialize Practice Mode UI on load
+        updatePracticeLanguageUI();
+
+        // ================= CLONE MODE LOGIC =================
+        const cloneRecordBtn = document.getElementById("clone-record-btn");
+        const cloneDeleteBtn = document.getElementById("clone-delete-btn");
+
+        // CLONE MODE: Record and send to backend
+        let cloneMediaRecorder = null;
+        let cloneAudioChunks = [];
+        let cloneStream = null;
+        let isCloneMicActive = false;
+
+        async function handleCloneRecord() {
+          isCloneMicActive = !isCloneMicActive;
+
+          if (isCloneMicActive) {
+            // Start recording
+            try {
+              cloneStream = await navigator.mediaDevices.getUserMedia({
+                audio: true,
+              });
+              cloneAudioChunks = [];
+              cloneMediaRecorder = new MediaRecorder(cloneStream, {
+                mimeType: "audio/webm",
+              });
+
+              cloneMediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) {
+                  cloneAudioChunks.push(e.data);
+                }
+              };
+
+              cloneMediaRecorder.start();
+
+              // UI updates
+              cloneRecordBtn.classList.add("active-state");
+              cloneRecordBtn.innerHTML = `
+                    <i class="ph-fill ph-waveform text-3xl animate-pulse"></i>
+                    <div class="text-left">
+                        <span class="block font-bold text-2xl">Recording...</span>
+                        <span class="block text-sm opacity-80 tracking-wider">Release to stop</span>
+                    </div>
+                `;
+            } catch (err) {
+              console.error("MIC ERROR:", err);
+              alert("Microphone blocked. Check browser permissions.");
+              isCloneMicActive = false;
+            }
+          } else {
+            // Stop recording and send to backend
+            if (cloneMediaRecorder && cloneMediaRecorder.state !== "inactive") {
+              cloneMediaRecorder.stop();
+            }
+
+            cloneMediaRecorder.onstop = async () => {
+              const audioBlob = new Blob(cloneAudioChunks, {
+                type: "audio/webm",
+              });
+
+              // Stop audio stream
+              if (cloneStream) {
+                cloneStream.getTracks().forEach((track) => track.stop());
+              }
+
+              // Send to backend
+              await sendCloneAudioToBackend(audioBlob);
+            };
+
+            // UI back to normal
+            cloneRecordBtn.classList.remove("active-state");
+            cloneRecordBtn.innerHTML = `
+                <i class="ph-fill ph-microphone text-3xl"></i>
+                <div class="text-left">
+                    <span class="block font-bold text-2xl">Record Sample</span>
+                    <span class="block text-sm opacity-80 tracking-wider">Tap and hold</span>
+                </div>
+            `;
+          }
+        }
+
+        async function sendCloneAudioToBackend(audioBlob) {
+          try {
+            const formData = new FormData();
+            formData.append("file", audioBlob, "audio.webm");
+
+            // Get voice name (you might want to add an input field for this)
+            const voiceName = prompt(
+              "Enter a name for your voice clone:",
+              "My Voice"
+            );
+            if (!voiceName) {
+              return; // User cancelled
+            }
+
+            formData.append("voice_name", voiceName);
+
+            // Note: This endpoint requires authentication
+            // You'll need to include the auth token in headers
+            const token = localStorage.getItem("access_token");
+            const headers = {};
+            if (token) {
+              headers["Authorization"] = `Bearer ${token}`;
+            }
+
+            cloneRecordBtn.disabled = true;
+            cloneRecordBtn.innerHTML = `
+                <i class="ph-bold ph-spinner animate-spin text-3xl"></i>
+                <div class="text-left">
+                    <span class="block font-bold text-2xl">Creating clone...</span>
+                    <span class="block text-sm opacity-80 tracking-wider">Please wait</span>
+                </div>
+            `;
+
+            const response = await fetch(
+              "http://localhost:8000/api/create_clone",
+              {
+                method: "POST",
+                headers: headers,
+                body: formData,
+              }
+            );
+
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(
+                errorData.detail || `Server error: ${response.status}`
+              );
+            }
+
+            const result = await response.json();
+            console.log("Clone created:", result);
+
+            // Store the model ID if returned
+            if (result.model_id) {
+              localStorage.setItem("user_voice_model_id", result.model_id);
+            }
+
+            alert(`Voice clone "${voiceName}" created successfully!`);
+
+            // Reset button
+            cloneRecordBtn.disabled = false;
+            cloneRecordBtn.innerHTML = `
+                <i class="ph-fill ph-microphone text-3xl"></i>
+                <div class="text-left">
+                    <span class="block font-bold text-2xl">Record Sample</span>
+                    <span class="block text-sm opacity-80 tracking-wider">Tap and hold</span>
+                </div>
+            `;
+          } catch (err) {
+            console.error("Clone creation failed:", err);
+            alert(`Error: ${err.message}`);
+
+            // Reset button
+            cloneRecordBtn.disabled = false;
+            cloneRecordBtn.innerHTML = `
+                <i class="ph-fill ph-microphone text-3xl"></i>
+                <div class="text-left">
+                    <span class="block font-bold text-2xl">Record Sample</span>
+                    <span class="block text-sm opacity-80 tracking-wider">Tap and hold</span>
+                </div>
+            `;
+          }
+        }
+
+        cloneRecordBtn.addEventListener("mousedown", () => handleCloneRecord());
+        cloneRecordBtn.addEventListener("mouseup", () => {
+          if (isCloneMicActive) {
+            handleCloneRecord();
+          }
+        });
+        cloneRecordBtn.addEventListener("mouseleave", () => {
+          if (isCloneMicActive) {
+            handleCloneRecord();
+          }
+        });
+
+        cloneDeleteBtn.addEventListener("click", async () => {
+          if (!confirm("Are you sure you want to delete your voice clone?")) {
+            return;
+          }
+
+          try {
+            const token = localStorage.getItem("access_token");
+            const headers = {
+              "Content-Type": "application/json",
+            };
+            if (token) {
+              headers["Authorization"] = `Bearer ${token}`;
+            }
+
+            // Note: You'll need to add a DELETE endpoint in the backend
+            const response = await fetch(
+              "http://localhost:8000/api/delete_clone",
+              {
+                method: "DELETE",
+                headers: headers,
+              }
+            );
+
+            if (!response.ok) {
+              const errorData = await response.json();
+              throw new Error(
+                errorData.detail || `Server error: ${response.status}`
+              );
+            }
+
+            localStorage.removeItem("user_voice_model_id");
+            alert("Voice clone deleted successfully!");
+          } catch (err) {
+            console.error("Delete failed:", err);
+            alert(`Error: ${err.message}`);
+          }
+        });
+
+        // ================= CONVERSATION MODE LOGIC =================
+        const conversationMicBtn = document.getElementById(
+          "conversation-mic-btn"
+        );
+        const conversationMicIcon = document.getElementById(
+          "conversation-mic-icon"
+        );
+        const conversationMicText = document.getElementById(
+          "conversation-mic-text"
+        );
+        const conversationMicSubtext = document.getElementById(
+          "conversation-mic-subtext"
+        );
+        const conversationVoiceBars = document.getElementById(
+          "conversation-voice-bars"
+        );
+        const conversationChatClearBtn = document.getElementById(
+          "conversation-chat-clear-btn"
+        );
+        const conversationLangSelect = document.getElementById(
+          "conversation-lang-select"
+        );
+        const conversationLangFlag = document.getElementById(
+          "conversation-lang-flag"
+        );
+        const conversationLangNameSpan = document.getElementById(
+          "conversation-lang-name"
+        );
+        const conversationChatContainer = document.getElementById(
+          "conversation-chat-container"
+        );
+
+        // Language UI for conversation mode
+        function updateConversationLanguageUI() {
+          const selectedLangCode = conversationLangSelect.value;
+          let flagUrl = "";
+          let langName = "";
+
+          if (selectedLangCode === "es") {
+            flagUrl = "https://flagicons.lipis.dev/flags/4x3/es.svg";
+            langName = "Spanish";
+          } else if (selectedLangCode === "fr") {
+            flagUrl = "https://flagicons.lipis.dev/flags/4x3/fr.svg";
+            langName = "French";
+          }
+
+          conversationLangFlag.src = flagUrl;
+          conversationLangFlag.alt = `${langName} Flag`;
+          conversationLangNameSpan.textContent = langName;
+        }
+
+        conversationLangSelect.addEventListener(
+          "change",
+          updateConversationLanguageUI
+        );
+
+        // Helpers for base64 audio → playable URL
         function base64ToBlob(base64) {
           const cleaned = base64.trim();
+          // If the backend already sends a data URL, just skip
           if (cleaned.startsWith("data:audio")) {
+            // We'll use this string directly as src
             return cleaned;
           }
           const binary = atob(cleaned);
@@ -1110,7 +1474,7 @@
           for (let i = 0; i < len; i++) {
             bytes[i] = binary.charCodeAt(i);
           }
-          const blob = new Blob([bytes]);
+          const blob = new Blob([bytes]); // no explicit type so browser sniffs it
           return URL.createObjectURL(blob);
         }
 
@@ -1131,180 +1495,217 @@
           return btn;
         }
 
-        function updateConversationHistory(response) {
-          if (!response) return;
-
-          const {
-            success,
-            user_message,
-            reply_text,
-            reply_audio,
-            audio_format,
-          } = response;
-          console.log(
-            success,
-            user_message,
-            reply_text,
-            reply_audio,
-            audio_format,
-            response
-          );
-
-          historySource.innerHTML = "";
-          historyTarget.innerHTML = "";
-
-          const sourceWrapper = document.createElement("div");
-          sourceWrapper.className = "flex flex-col items-center gap-2";
-
-          const sourceTextEl = document.createElement("p");
-          sourceTextEl.className =
-            "text-slate-700 font-bold bg-white p-3 rounded-xl shadow-sm border border-slate-100 text-center";
-          sourceTextEl.innerHTML =
-            user_message || "(No transcription received)";
-          sourceWrapper.appendChild(sourceTextEl);
-
-          historySource.appendChild(sourceWrapper);
-
-          const targetWrapper = document.createElement("div");
-          targetWrapper.className = "flex flex-col items-center gap-2";
-
-          const targetTextEl = document.createElement("p");
-          targetTextEl.className = "translation-bubble text-center";
-          targetTextEl.textContent = reply_text || "(No reply received)";
-          targetWrapper.appendChild(targetTextEl);
-
-          if (reply_audio) {
-            const tgtUrl = base64ToBlob(reply_audio);
-            const listenBtn = createPlayButton(() => {
-              currentAudio = new Audio(tgtUrl);
-              currentAudio.play();
-            }, "bg-emerald-100 hover:bg-emerald-200 text-emerald-800 mt-1");
-            listenBtn.innerHTML =
-              '<i class="ph-bold ph-speaker-high"></i> Listen';
-            targetWrapper.appendChild(listenBtn);
-          }
-
-          historyTarget.appendChild(targetWrapper);
+        // ================= CONVERSATION MODE LOGIC =================
+        // CHAT HISTORY MANAGEMENT FOR CONVERSATION MODE
+        function getConversationHistory() {
+          const stored = sessionStorage.getItem("conversation_history");
+          return stored ? JSON.parse(stored) : [];
         }
 
-        async function uploadAudioToBackend(audioBlob) {
-          console.log("Uploading blob:", audioBlob);
+        function saveConversationHistory(history) {
+          sessionStorage.setItem(
+            "conversation_history",
+            JSON.stringify(history)
+          );
+        }
 
+        function addConversationMessage(role, content) {
+          const history = getConversationHistory();
+          history.push({ role, content });
+          if (history.length > 20) {
+            history.shift();
+          }
+          saveConversationHistory(history);
+        }
+
+        // CONVERSATION MODE: Record and send to backend
+        let conversationMediaRecorder = null;
+        let conversationAudioChunks = [];
+        let conversationStream = null;
+        let isConversationMicActive = false;
+
+        async function handleConversationMicToggle() {
+          isConversationMicActive = !isConversationMicActive;
+
+          if (isConversationMicActive) {
+            // Start recording
+            try {
+              conversationStream = await navigator.mediaDevices.getUserMedia({
+                audio: true,
+              });
+              conversationAudioChunks = [];
+              conversationMediaRecorder = new MediaRecorder(
+                conversationStream,
+                {
+                  mimeType: "audio/webm",
+                }
+              );
+
+              conversationMediaRecorder.ondataavailable = (e) => {
+                if (e.data.size > 0) {
+                  conversationAudioChunks.push(e.data);
+                }
+              };
+
+              conversationMediaRecorder.start();
+
+              // UI updates
+              conversationMicBtn.classList.add("active-state");
+              conversationMicIcon.classList.remove("ph-microphone");
+              conversationMicIcon.classList.add("ph-waveform", "animate-pulse");
+              conversationMicText.textContent = "Listening...";
+              conversationMicSubtext.textContent = "Speak clearly";
+              conversationVoiceBars.classList.add("animate-voice");
+            } catch (err) {
+              console.error("MIC ERROR:", err);
+              alert("Microphone blocked. Check browser permissions.");
+              isConversationMicActive = false;
+            }
+          } else {
+            // Stop recording and send to backend
+            if (
+              conversationMediaRecorder &&
+              conversationMediaRecorder.state !== "inactive"
+            ) {
+              conversationMediaRecorder.stop();
+            }
+
+            conversationMediaRecorder.onstop = async () => {
+              const audioBlob = new Blob(conversationAudioChunks, {
+                type: "audio/webm",
+              });
+
+              // Stop audio stream
+              if (conversationStream) {
+                conversationStream.getTracks().forEach((track) => track.stop());
+              }
+
+              // Send to backend
+              await sendConversationAudioToBackend(audioBlob);
+            };
+
+            // UI back to normal
+            conversationMicBtn.classList.remove("active-state");
+            conversationMicIcon.classList.remove(
+              "ph-waveform",
+              "animate-pulse"
+            );
+            conversationMicIcon.classList.add("ph-microphone");
+            conversationMicText.textContent = "Tap to speak";
+            conversationMicSubtext.textContent = "Processing...";
+            conversationVoiceBars.classList.remove("animate-voice");
+          }
+        }
+
+        async function sendConversationAudioToBackend(audioBlob) {
           try {
             const formData = new FormData();
             formData.append("file", audioBlob, "audio.webm");
-            formData.append("target_lang", "es");
 
-            // Use saved cloned voice if available; otherwise default model
-            const savedVoiceId = localStorage.getItem("voice_id");
-            const modelId = savedVoiceId || "54e3a85ac9594ffa83264b8a494b901b";
+            // Get target language and model ID
+            const targetLang = conversationLangSelect.value;
+            const modelId =
+              localStorage.getItem("user_voice_model_id") ||
+              "03397b4c4be74759b72533b663fbd001";
+
+            formData.append("target_lang", targetLang);
             formData.append("model_id", modelId);
 
-            const chatHistory = { User: "hello", Assistant: "try this" };
+            // Get and send chat history
+            const chatHistory = getConversationHistory();
             formData.append("chat_history", JSON.stringify(chatHistory));
+
+            // Clear placeholder if present
+            const placeholder =
+              conversationChatContainer.querySelector("p.text-slate-400");
+            if (placeholder) {
+              conversationChatContainer.innerHTML = "";
+            }
 
             const response = await fetch("http://localhost:8000/api/reply", {
               method: "POST",
               body: formData,
             });
-            console.log(response);
 
             if (!response.ok) {
-              console.error("Server returned non-OK status:", response.status);
-              return;
+              const errorData = await response
+                .json()
+                .catch(() => ({ detail: `Server error: ${response.status}` }));
+              throw new Error(
+                errorData.detail || `Server error: ${response.status}`
+              );
             }
 
             const result = await response.json();
-            console.log("Server responded:", result);
-            updateConversationHistory(result);
+
+            // Display user message
+            const userBubble = createUserBubble(result.user_message);
+            conversationChatContainer.appendChild(userBubble);
+            conversationChatContainer.scrollTop =
+              conversationChatContainer.scrollHeight;
+
+            // Add user message to history
+            addConversationMessage("user", result.user_message);
+
+            // Display AI reply with audio play button
+            const aiBubble = createAiBubble(
+              result.reply_text,
+              result.reply_audio || null
+            );
+            conversationChatContainer.appendChild(aiBubble);
+            conversationChatContainer.scrollTop =
+              conversationChatContainer.scrollHeight;
+
+            // Add AI reply to history
+            addConversationMessage("assistant", result.reply_text);
+
+            // Auto-play audio if available (user can replay using the button)
+            if (result.reply_audio) {
+              const audioData = atob(result.reply_audio);
+              const audioArray = new Uint8Array(audioData.length);
+              for (let i = 0; i < audioData.length; i++) {
+                audioArray[i] = audioData.charCodeAt(i);
+              }
+              const audioBlob = new Blob([audioArray], { type: "audio/wav" });
+              const audioUrl = URL.createObjectURL(audioBlob);
+              const audio = new Audio(audioUrl);
+              audio.play();
+              audio.onended = () => URL.revokeObjectURL(audioUrl);
+            }
+
+            // Update UI
+            conversationMicSubtext.textContent = "Ready to speak";
           } catch (err) {
             console.error("Upload failed:", err);
+            alert(`Error: ${err.message}`);
+            conversationMicSubtext.textContent = "Error - try again";
           }
         }
 
-        let convMediaRecorder = null;
-        let convAudioChunks = [];
-        let convStream = null;
-        let isConvMicActive = false;
-
-        async function handleConvMicToggle() {
-          console.log("Mic clicked");
-          isConvMicActive = !isConvMicActive;
-
-          if (isConvMicActive) {
-            console.log("Starting recording...");
-
-            try {
-              convStream = await navigator.mediaDevices.getUserMedia({
-                audio: true,
-              });
-
-              convAudioChunks = [];
-              convMediaRecorder = new MediaRecorder(convStream, {
-                mimeType: "audio/webm",
-              });
-
-              convMediaRecorder.ondataavailable = (e) =>
-                convAudioChunks.push(e.data);
-              convMediaRecorder.start();
-
-              convMicBtn.classList.add("active-state");
-              convMicIcon.classList.remove("ph-microphone");
-              convMicIcon.classList.add("ph-waveform", "animate-pulse");
-              convMicText.textContent = "Listening...";
-              convMicSubtext.textContent = "Speak clearly";
-              convVoiceBars.classList.add("animate-voice");
-            } catch (err) {
-              console.error("MIC ERROR:", err);
-              alert("Microphone blocked. Check browser permissions.");
-              isConvMicActive = false;
-            }
-          } else {
-            console.log("Stopping recording...");
-
-            if (!convMediaRecorder) return;
-
-            convMediaRecorder.stop();
-
-            convMediaRecorder.onstop = async () => {
-              console.log("Recorder stopped");
-
-              const audioBlob = new Blob(convAudioChunks, {
-                type: "audio/webm",
-              });
-
-              if (convStream) {
-                convStream.getTracks().forEach((t) => t.stop());
-              }
-
-              console.log("Final blob:", audioBlob);
-              await uploadAudioToBackend(audioBlob);
-            };
-
-            convMicBtn.classList.remove("active-state");
-            convMicIcon.classList.remove("ph-waveform", "animate-pulse");
-            convMicIcon.classList.add("ph-microphone");
-            convMicText.textContent = "Tap to speak";
-            convMicSubtext.textContent = "Tap and talk";
-            convVoiceBars.classList.remove("animate-voice");
-          }
+        // Connect conversation mic button
+        if (conversationMicBtn) {
+          conversationMicBtn.addEventListener(
+            "click",
+            handleConversationMicToggle
+          );
         }
 
-        convMicBtn.addEventListener("click", handleConvMicToggle);
+        // Connect conversation clear button
+        if (conversationChatClearBtn) {
+          conversationChatClearBtn.addEventListener("click", () => {
+            conversationChatContainer.innerHTML = `
+            <p class="text-slate-400 italic text-center px-8">
+              Your conversation will appear here...
+            </p>
+          `;
+            sessionStorage.removeItem("conversation_history");
+          });
+        }
 
-        convClearBtn.addEventListener("click", () => {
-          historySource.innerHTML =
-            '<p class="text-slate-400 italic text-center px-8">Your speech will appear here...</p>';
-          historyTarget.innerHTML =
-            '<p class="text-green-600/50 italic text-center px-8">...and the correction will appear here.</p>';
-        });
-
-        // ===== INIT (REAL) =====
-        updateConvLanguageUI();
-        document.body.classList.add("mode-conversation");
-
-        // helper to manually test with any real response from console
-        window.testRealReply = (resp) => updateConversationHistory(resp);
+        // Initialize Conversation Mode UI on load
+        if (conversationLangSelect) {
+          updateConversationLanguageUI();
+        }
       });
     </script>
   </body>

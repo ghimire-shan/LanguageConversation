@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi import APIRouter, Depends, HTTPException, status, Request, UploadFile, File, Form
 from fastapi.responses import Response
 from deepgram import DeepgramClient
 from google import genai
@@ -109,6 +109,7 @@ async def transcribe_audio(audio_data: bytes, target_language: str='en'):
         else:
             detected_lang = target_language
         
+        print(transcript)
         return {
             'text': transcript,
             'confidence': confidence
@@ -168,7 +169,11 @@ async def get_correction(text, language):
 
     
 @router.post("/practice")
-async def practice_speech(file, target_lang, model_id):
+async def practice_speech(
+    file: UploadFile = File(...),
+    target_lang: str = Form(...),
+    model_id: str = Form(...)
+):
 
     try:
         audio_data = await file.read()
@@ -193,11 +198,13 @@ async def practice_speech(file, target_lang, model_id):
         # Convert the audio to base64 for easy frontend handling
         audio_base64 = base64.b64encode(correction_audio).decode('utf-8')
 
+
         return {
             "success": True,
             "corrected_text": corrected_text,
             "audio_base64": audio_base64,
             "audio_format": "wav",
+            "initial_text": transcription['text'],
         }
 
     
