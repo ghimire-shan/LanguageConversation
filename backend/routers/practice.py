@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
-from deepgram import DeepgramClient, PrerecordedOptions, FileSource
-import google.genai as genai
+from deepgram import DeepgramClient
+from google import genai
 import json
 import os
 from config import settings
