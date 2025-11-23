@@ -1,8 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
+from fastapi.responses import Response
 from deepgram import DeepgramClient
 from google import genai
 import json
 import os
+
+from fishaudio import FishAudio
+from schemas.tts import TTSRequest
 from config import settings
 
 
@@ -123,3 +127,66 @@ async def practice_speech(file, target_lang, clone):
         raise 
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error with practice mode {str(e)}")
+
+@router.post("/tts")
+async def generate_speech(request: TTSRequest):
+    """
+    Generate speech from text using a Fish Audio cloned voice model.
+    
+    Takes a transcript and model_id (your cloned voice model ID), returns audio file.
+    """
+    try:
+        # Get Fish Audio API key from environment
+        api_key = os.getenv("FISH_AUDIO_API_KEY")
+        if not api_key:
+            raise HTTPException(
+                status_code=500,
+                detail="Fish Audio API key not configured. Please set FISH_AUDIO_API_KEY environment variable."
+            )
+        
+        # Validate input
+        if not request.transcript.strip():
+            raise HTTPException(
+                status_code=400,
+                detail="Transcript cannot be empty"
+            )
+        
+        if not request.model_id.strip():
+            raise HTTPException(
+                status_code=400,
+                detail="Model ID cannot be empty"
+            )
+        
+        # Initialize Fish Audio client
+        client = FishAudio(api_key=api_key)
+        
+        # Generate speech using the cloned voice model
+        audio = client.tts.convert(
+            text=request.transcript,
+            reference_id=request.model_id  # Your cloned voice model ID
+        )
+        
+        # Handle audio response - SDK may return bytes or a file-like object
+        if isinstance(audio, bytes):
+            audio_data = audio
+        elif hasattr(audio, 'read'):
+            audio_data = audio.read()
+        else:
+            # Try to convert to bytes
+            audio_data = bytes(audio)
+        
+        return Response(
+            content=audio_data,
+            media_type="audio/mpeg",  # Fish Audio typically returns MP3
+            headers={
+                "Content-Disposition": "attachment; filename=speech.mp3"
+            }
+        )
+            
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=f"Error generating speech: {str(e)}"
+        )
