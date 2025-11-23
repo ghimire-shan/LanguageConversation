@@ -3,12 +3,12 @@ from fastapi.responses import Response
 from deepgram import DeepgramClient
 from google import genai
 import json
-import os
+import base64
 
 from fishaudio import FishAudio
 from schemas.tts import TTSRequest
 from config import settings
-
+from schemas import tts
 
 """
     The routes for the practice gets a audio stream, language, and voice to use
@@ -23,6 +23,7 @@ from config import settings
 
 deepgram = DeepgramClient(settings.DEEPGRAM_ENV_KEY)
 genai.configure(apk_key = settings.GEMINI_APK_KEY)
+fish_audio = FishAudio(settings.FISH_AUDIO_API_KEY)
 
 router = APIRouter(prefix="/api", tags=['api'])
 
@@ -105,7 +106,7 @@ async def get_correction(text, language):
 
     
 @router.post("/practice")
-async def practice_speech(file, target_lang, clone):
+async def practice_speech(file, target_lang, model_id):
 
     try:
         audio_data = await file.read()
@@ -121,6 +122,21 @@ async def practice_speech(file, target_lang, clone):
 
         # Step 2 is to correct the audio
         correction = await get_correction(text=transcription['text'], language=target_lang)
+        corrected_text = correction['corrected_text']
+
+        # Step 3 is to send it to Fish audio for it to be made into the sound of someone
+        request = tts.TTSRequest(transcript= corrected_text, model_id = model_id )
+        correction_audio = await generate_speech(request= request)
+
+        # Convert the audio to base64 for easy frontend handling
+        audio_base64 = base64.b64decode(correction_audio).decode('utf-8')
+
+        return {
+            "success": True,
+            "corrected_text": corrected_text['corrected_text'],
+            "audio_base64": audio_base64,
+            "audio_format": "wav",
+        }
 
     
     except HTTPException:
@@ -128,7 +144,6 @@ async def practice_speech(file, target_lang, clone):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error with practice mode {str(e)}")
 
-@router.post("/tts")
 async def generate_speech(request: TTSRequest):
     """
     Generate speech from text using a Fish Audio cloned voice model.
@@ -136,14 +151,6 @@ async def generate_speech(request: TTSRequest):
     Takes a transcript and model_id (your cloned voice model ID), returns audio file.
     """
     try:
-        # Get Fish Audio API key from environment
-        api_key = os.getenv("FISH_AUDIO_API_KEY")
-        if not api_key:
-            raise HTTPException(
-                status_code=500,
-                detail="Fish Audio API key not configured. Please set FISH_AUDIO_API_KEY environment variable."
-            )
-        
         # Validate input
         if not request.transcript.strip():
             raise HTTPException(
@@ -157,31 +164,20 @@ async def generate_speech(request: TTSRequest):
                 detail="Model ID cannot be empty"
             )
         
-        # Initialize Fish Audio client
-        client = FishAudio(api_key=api_key)
-        
         # Generate speech using the cloned voice model
-        audio = client.tts.convert(
+        audio = fish_audio.tts.convert(
             text=request.transcript,
-            reference_id=request.model_id  # Your cloned voice model ID
+            reference_id=request.model_id,
+            format='wav',
+            latency='balanced'
         )
         
-        # Handle audio response - SDK may return bytes or a file-like object
-        if isinstance(audio, bytes):
-            audio_data = audio
-        elif hasattr(audio, 'read'):
-            audio_data = audio.read()
-        else:
-            # Try to convert to bytes
-            audio_data = bytes(audio)
+        # Generate speech
+        audio_chunks = []
+        for chunk in audio:
+            audio_chunks.append(chunk)
         
-        return Response(
-            content=audio_data,
-            media_type="audio/mpeg",  # Fish Audio typically returns MP3
-            headers={
-                "Content-Disposition": "attachment; filename=speech.mp3"
-            }
-        )
+        return b"".join(audio_chunks)
             
     except HTTPException:
         raise

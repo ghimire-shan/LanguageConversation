@@ -2,29 +2,23 @@ import os
 from dotenv import load_dotenv
 from fishaudio import FishAudio
 from fishaudio.utils import save
+from fastapi import APIRouter, Depends, HTTPException, status, Request
+from config import settings
 
-load_dotenv()
+fish_audio = FishAudio(settings.FISH_AUDIO_API_KEY)
+router = APIRouter(prefix="/api", tags=['api'])
 
-# Load API key
-API_KEY = os.getenv("FISH_API_KEY")
-
-if not API_KEY:
-    print("❌ ERROR: Missing FISH_API_KEY in .env file")
-    exit()
-
-# Create Fish Audio client
-client = FishAudio(api_key=API_KEY)
-
-print("🎤 Step 1: Creating voice clone...")
-
-# Read your audio sample
-with open("user_sample.wav", "rb") as f:
-    voice = client.voices.create(
-        title="My Voice",
-        voices=[f.read()],
-        description="Custom voice clone created via Python SDK"
-    )
-
-print("✅ Voice clone created successfully!")
-print("🔑 Voice ID:", voice.id)
-print("\n🎯 All done!")
+@router.post("/create_clone")
+async def create_user_clone(file):
+    try:
+        with open(file, "rb") as f:
+            voice = fish_audio.voices.create(
+            title="My Voice",
+            voices=[f.read()],
+            description="Custom voice clone created via Python SDK"
+        )
+        return {'voice_id': voice.id}
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error while creating user clone")
