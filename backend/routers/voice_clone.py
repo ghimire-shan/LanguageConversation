@@ -27,17 +27,4 @@ with open("user_sample.wav", "rb") as f:
 
 print("✅ Voice clone created successfully!")
 print("🔑 Voice ID:", voice.id)
-
-print("\n🔊 Step 2: Generating TTS with your cloned voice...")
-
-# Generate speech using your saved voice model
-audio = client.tts.convert(
-    text="Hello! This is your cloned voice speaking using the Fish Audio SDK.",
-    reference_id=voice.id
-)
-
-OUTPUT_FILE = "cloned_voice_output.wav"
-save(audio, OUTPUT_FILE)
-
-print(f"🎉 Saved generated audio to: {OUTPUT_FILE}")
 print("\n🎯 All done!")
