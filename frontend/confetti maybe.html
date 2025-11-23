@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Language App Final - Reverted to Perfect State</title>
+    <title>Language Converter AI - Final with 15s Transcript</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     
@@ -18,51 +18,46 @@
             --card-hover-bg: #F8FAFC;
             --text-primary: #1A1A1A;
             --text-secondary: #6B7280;
-            /* Original vibrant blue/teal accent colors */
             --accent-blue: #3B82F6;
             --accent-teal: #14B8A6;
-            --accent-green: #10B981;
+            --accent-indigo: #6366F1;
+            --accent-rose: #E11D48;
             --button-dark: #1F2937;
             --border-light: #E2E8F0;
             --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
             --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
             --radius-lg: 24px;
-            --radius-md: 16px;
         }
 
         /* --- BASE STYLES --- */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color);
-            margin: 0;
-            min-height: 100vh;
-            position: relative;
+            background-color: var(--bg-color); margin: 0; min-height: 100vh; position: relative;
         }
 
+        /* --- ENTRANCE ANIMATIONS --- */
+        @keyframes slideDownFade { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes slideUpFade { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        .stagger-1 { animation: slideDownFade 0.6s ease-out backwards; }
+        .stagger-2 { animation: slideUpFade 0.6s ease-out backwards 0.2s; }
+        .stagger-3 { animation: slideUpFade 0.6s ease-out backwards 0.3s; }
+        .stagger-4 { animation: slideUpFade 0.6s ease-out backwards 0.5s; }
+
         /* --- CONFETTI STYLES --- */
-        #confetti-container {
-            position: absolute;
-            inset: 0;
-            z-index: 0;
-            pointer-events: none;
-            overflow: hidden;
-        }
-        .confetti-piece {
-            position: absolute;
-            border-radius: 2px;
-        }
+        #confetti-container { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+        .confetti-piece { position: absolute; border-radius: 2px; }
 
         /* --- VIEW SWITCHING UTILITIES --- */
         .view-container {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            padding: 1rem;
-            z-index: 10;
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); padding: 1rem; z-index: 10; pointer-events: none; 
         }
         @media (min-width: 768px) { .view-container { padding: 2rem; } }
-
         .active-view { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; filter: blur(0px); }
-        .hidden-view { opacity: 0; transform: translateY(20px) scale(0.98); pointer-events: none; filter: blur(4px); }
+        .hidden-view { opacity: 0; transform: translateY(20px) scale(0.98); filter: blur(4px); }
+        
+        /* Simple hide utility for practice states */
+        .hidden { display: none; }
 
         /* --- MAIN LAYOUT CONTAINER --- */
         .main-layout-grid {
@@ -71,56 +66,38 @@
         }
         @media (max-width: 768px) { .main-layout-grid { flex-direction: column; height: auto; } }
 
-
-        /* --- THE CARD STYLES & HOVER EFFECT --- */
+        /* --- THE CARD STYLES --- */
         .app-card {
-            background-color: var(--card-bg);
-            border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-md);
-            padding: 2.5rem;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            border: 1px solid var(--border-light);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden;
-            position: relative;
+            background-color: var(--card-bg); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
+            padding: 2.5rem; flex: 1; display: flex; flex-direction: column;
+            border: 1px solid var(--border-light); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            overflow: hidden; position: relative;
         }
-
         @media (hover: hover) {
-            .app-card:hover {
-                background-color: var(--card-hover-bg);
-                transform: translateY(-8px);
-                box-shadow: var(--shadow-lg);
-                border-color: #CBD5E1;
-            }
+            .app-card:hover { background-color: var(--card-hover-bg); transform: translateY(-8px); box-shadow: var(--shadow-lg); border-color: #CBD5E1; }
         }
-
         .card-centered { align-items: center; text-align: center; justify-content: center; }
+
+        /* --- AVATAR DYNAMIC COLORS --- */
+        .avatar {
+            width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            font-size: 24px; color: white; box-shadow: var(--shadow-sm); transition: background 0.5s ease;
+        }
+        body.mode-conversation .avatar { background: linear-gradient(135deg, #60A5FA, var(--accent-blue)); }
+        body.mode-practice .avatar { background: linear-gradient(135deg, #A5B4FC, var(--accent-indigo)); }
+        body.mode-clone .avatar { background: linear-gradient(135deg, #FDA4AF, var(--accent-rose)); }
 
 
         /* --- COMPONENT STYLES --- */
-        .avatar {
-            width: 80px; height: 80px;
-            background: linear-gradient(135deg, #60A5FA, #3B82F6);
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 32px; color: white; box-shadow: var(--shadow-md);
-        }
-
         .mic-button {
-            background-color: var(--button-dark);
-            color: white; width: 100%; padding: 1rem;
+            background-color: var(--button-dark); color: white; width: 100%; padding: 1rem;
             border-radius: 100px; display: flex; align-items: center; justify-content: center;
-            gap: 1rem; cursor: pointer; transition: all 0.2s ease;
-            box-shadow: var(--shadow-md);
+            gap: 1rem; cursor: pointer; transition: all 0.2s ease; box-shadow: var(--shadow-md);
             position: relative; overflow: hidden; z-index: 1;
         }
         .mic-button:hover { transform: scale(1.02); box-shadow: var(--shadow-lg); }
         .mic-button:active { transform: scale(0.98); }
-
-        .mic-button.active-state {
-            background: linear-gradient(to right, var(--accent-blue), var(--accent-teal));
-        }
+        .mic-button.active-state { background: linear-gradient(to right, var(--accent-blue), var(--accent-teal)); }
 
         /* Voice Bar Animations */
         .voice-bar { width: 4px; height: 4px; background-color: var(--text-secondary); border-radius: 2px; opacity: 0.3; transition: all 0.2s ease; }
@@ -138,27 +115,19 @@
             border: 1px solid var(--border-light); transition: border-color 0.3s ease;
         }
         .app-card:hover .transcript-box { border-color: #CBD5E1; }
-
         .translation-bubble {
-            background-color: var(--accent-teal);
-            color: white;
-            font-weight: 700;
-            padding: 0.75rem 1rem;
-            border-radius: 1rem;
-            box-shadow: var(--shadow-sm);
+            background-color: var(--accent-teal); color: white; font-weight: 700;
+            padding: 0.75rem 1rem; border-radius: 1rem; box-shadow: var(--shadow-sm);
         }
 
         /* Bottom Nav Specifics */
-        .bottom-nav-container {
-            position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%);
-            width: 100%; max-width: 400px; z-index: 50;
-        }
+        .bottom-nav-container { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); width: 90%; max-width: 450px; z-index: 50; }
         .bottom-nav {
             background-color: var(--card-bg); padding: 0.5rem; border-radius: 100px;
             box-shadow: var(--shadow-lg); display: flex; gap: 0.5rem; border: 1px solid var(--border-light);
         }
         .nav-button {
-            padding: 0.75rem 2rem; border-radius: 100px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; flex: 1; text-align: center;
+            padding: 0.75rem 1rem; border-radius: 100px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; flex: 1; text-align: center; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; font-size: 0.9rem;
         }
         .nav-button.active { background-color: var(--bg-color); color: var(--text-primary); box-shadow: var(--shadow-sm); }
         .nav-button.inactive { color: var(--text-secondary); background-color: transparent; }
@@ -171,37 +140,48 @@
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
-<body class="h-full overflow-hidden bg-[#F8FAFC]">
+<body class="h-full overflow-hidden bg-[#F8FAFC] mode-conversation">
 
     <div id="confetti-container"></div>
 
+    <div class="fixed bottom-4 right-4 z-50 flex items-center gap-2 bg-white/80 backdrop-blur-md p-2 pr-4 rounded-full shadow-sm border border-slate-100 transition-all hover:shadow-md cursor-default animate-in fade-in slide-in-from-bottom-4 duration-700">
+        <img src="https://placehold.co/40x40/3B82F6/ffffff?text=MH" alt="Mad Hacks Logo" class="w-8 h-8 rounded-full">
+        <span class="font-bold text-slate-700 text-sm">Language Converter AI</span>
+    </div>
 
-    <main class="relative h-full w-full overflow-hidden pb-24">
+    <main class="relative h-full w-full overflow-hidden pb-28">
         
-
         <div id="conversation-view" class="view-container active-view">
-            <div class="main-layout-grid">
-            
-                <section class="app-card card-centered md:max-h-[80vh]">
-                    <div class="avatar-container relative mb-6">
-                        <div class="avatar">
-                            <i class="ph-bold ph-user-circle"></i>
-                        </div>
-                        <div class="absolute bottom-0 right-0 w-4 h-4 bg-green-400 rounded-full border-[3px] border-white animate-pulse"></div>
+            <header class="flex items-center justify-between mb-6 max-w 1000px mx-auto stagger-1 relative z-20">
+                 <div class="avatar-container relative">
+                    <div class="avatar"><i class="ph-bold ph-user-circle"></i></div>
+                    <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-[2px] border-white animate-pulse"></div>
+                </div>
+                <div class="flex items-center gap-3 bg-white/80 backdrop-blur-sm p-2 rounded-2xl shadow-sm border border-blue-100/50">
+                    <div class="flex items-center gap-1 text-orange-500 font-bold text-sm px-2"><i class="ph-fill ph-fire text-lg"></i> 3 Day Streak</div>
+                    <div class="w-8 h-8 relative flex items-center justify-center">
+                        <svg class="w-full h-full rotate-[-90deg]" viewBox="0 0 36 36"><path class="text-slate-200" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"/><path class="text-blue-500" stroke-dasharray="75, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
+                        <span class="absolute text-[10px] font-bold text-blue-600">75%</span>
                     </div>
+                </div>
+            </header>
+
+            <div class="main-layout-grid">
+                <section class="app-card card-centered md:max-h-[80vh] stagger-2">
                     <h1 class="text-2xl md:text-3xl font-bold text-slate-800 mb-2 tracking-tight">Conversation Mode</h1>
-                    <p class="text-base text-slate-500 font-medium mb-8">I'm listening! What's on your mind?</p>
+                    <p class="text-base text-slate-500 font-medium mb-8">Tap the mic to start speaking.</p>
 
                     <div class="w-full max-w-xs flex flex-col gap-4 items-center relative z-10 mb-2">
-                        <div class="w-full flex items-center justify-between bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm transition-colors hover:border-blue-200">
-                            <div class="pl-3 font-bold text-slate-600 text-sm">Speaking: <span class="text-blue-600">English</span></div>
-                            <div class="flex items-center gap-2 text-blue-600 relative">
-                                <i class="ph-bold ph-arrow-right"></i>
-                                <select id="conv-lang-select" class="appearance-none bg-transparent font-bold text-sm text-blue-600 cursor-pointer outline-none pr-6 z-10 relative py-1">
-                                    <option value="es">Spanish 🇪🇸</option>
-                                    <option value="fr">French 🇫🇷</option>
-                                </select>
-                                <i class="ph-bold ph-caret-down absolute right-0 pointer-events-none"></i>
+                        <div class="w-full flex items-center justify-center bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm transition-colors hover:border-blue-200 relative">
+                            <select id="conv-lang-select" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
+                                <option value="es">Spanish</option>
+                                <option value="fr">French</option>
+                            </select>
+                            <div class="flex items-center gap-2 text-blue-600 pointer-events-none z-10">
+                                <span class="text-slate-500 font-medium text-sm mr-1">Talk in:</span>
+                                <img id="target-lang-flag" src="https://flagicons.lipis.dev/flags/4x3/es.svg" alt="Target Flag" class="w-5 h-4 object-cover rounded-sm shadow-sm">
+                                <span id="target-lang-name" class="font-bold text-sm">Spanish</span>
+                                <i class="ph-bold ph-caret-down"></i>
                             </div>
                         </div>
 
@@ -219,11 +199,10 @@
                     </div>
                 </section>
 
-                <section class="app-card md:max-h-[80vh]">
+                <section class="app-card md:max-h-[80vh] stagger-3">
                     <div class="mb-4 flex items-center justify-between">
                         <div>
                             <h2 class="text-xl font-bold text-slate-800 tracking-tight">Live Transcript</h2>
-                            <p id="conv-lang-summary" class="text-sm text-slate-500 font-medium mt-1">English <i class="ph-bold ph-arrow-right text-xs mx-1"></i> <span class="text-green-500">Spanish</span></p>
                         </div>
                         <i class="ph-bold ph-trash text-slate-400 text-xl cursor-pointer hover:text-red-500 transition-colors p-2 tactile-touch" id="conv-clear-btn"></i>
                     </div>
@@ -232,54 +211,64 @@
                         <div class="transcript-box">
                             <span class="text-xs font-bold text-slate-500 tracking-wider mb-4 block">YOU SAID</span>
                             <div id="history-source" class="flex-1 overflow-y-auto no-scrollbar flex flex-col justify-center gap-3">
-                                <p class="text-slate-700 font-bold bg-white p-3 rounded-xl shadow-sm border border-slate-100">Hello, how are you?</p>
-                                <p class="text-slate-700 font-bold bg-white p-3 rounded-xl shadow-sm border border-slate-100">Where is the bathroom?</p>
-                                <p class="text-slate-700 font-bold bg-white p-3 rounded-xl shadow-sm border border-slate-100">A coffee, please.</p>
+                                <p class="text-slate-400 italic text-center px-8">Your speech will appear here...</p>
                             </div>
                         </div>
                         <div class="transcript-box mb-0">
-                            <span id="target-translation-label" class="text-xs font-bold text-green-600 tracking-wider mb-4 block">TRANSLATION (SPANISH)</span>
+                            <span id="target-translation-label" class="text-xs font-bold text-green-600 tracking-wider mb-4 block">CORRECT (SPANISH)</span>
                             <div id="history-target" class="flex-1 overflow-y-auto no-scrollbar flex flex-col justify-center gap-3">
-                                <p class="translation-bubble">Hola, ¿cómo estás?</p>
-                                <p class="translation-bubble">¿Dónde está el baño?</p>
-                                <p class="translation-bubble">Un café, por favor.</p>
+                                <p class="text-green-600/50 italic text-center px-8">...and the correction will appear here.</p>
                             </div>
                         </div>
                     </div>
                 </section>
             </div>
         </div> <div id="practice-view" class="view-container hidden-view">
+             <header class="flex items-center justify-between mb-6 max-w 1000px mx-auto relative z-20">
+                <div class="avatar-container relative">
+                    <div class="avatar"><i class="ph-bold ph-user-circle"></i></div>
+                </div>
+                <h2 class="text-xl font-bold text-slate-800 tracking-tight">Practice Mode</h2>
+            </header>
+
              <div class="main-layout-grid items-center">
-            
                 <section class="app-card card-centered max-w-3xl mx-auto md:max-h-[80vh]">
                     
-                    <div class="mb-8">
+                    <div class="mb-6">
                         <div class="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 mx-auto mb-4 shadow-sm border border-indigo-50">
                             <i class="ph-fill ph-speaker-high text-3xl"></i>
                         </div>
-                        <h2 class="text-3xl font-bold text-slate-800 mb-2 tracking-tight">Pronunciation Practice</h2>
-                        <p class="text-base text-slate-500 font-medium">Perfect your accent with instant feedback.</p>
+                        <h2 class="text-3xl font-bold text-slate-800 mb-2 tracking-tight">Select a Voice Partner</h2>
+                        <p class="text-base text-slate-500 font-medium">Choose who you want to practice with.</p>
                     </div>
 
-                    <div id="practice-input-state" class="w-full max-w-lg flex flex-col gap-8 items-center transition-all duration-500">
-                         <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 w-full shadow-sm">
-                            <p class="text-sm font-bold text-slate-500 mb-1 uppercase tracking-wider">Phrase to read:</p>
-                            <p class="text-3xl font-black text-indigo-900 leading-tight">"Buenos días, amigo."</p>
-                         </div>
-                        
+                    <div id="practice-input-state" class="w-full max-w-lg flex flex-col gap-6 items-center transition-all duration-500">
+                        <div class="w-full mb-4 relative z-20">
+                            <div class="w-full flex items-center justify-between bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-sm transition-all hover:border-indigo-300 hover:shadow-md cursor-pointer relative">
+                                <span id="selected-voice-display" class="font-bold text-indigo-700 flex items-center gap-2">
+                                    <i class="ph-fill ph-user"></i> Your Own Voice
+                                </span>
+                                <i class="ph-bold ph-caret-down text-indigo-500"></i>
+                                <select id="practice-voice-select" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
+                                    <option value="own_voice">Your Own Voice</option>
+                                    <option value="trump">Donald Trump</option>
+                                    <option value="ronaldo">Cristiano Ronaldo</option>
+                                    <option value="spongebob">SpongeBob SquarePants</option>
+                                    <option value="biden">Joe Biden</option>
+                                </select>
+                            </div>
+                        </div>
+
                         <button id="prac-mic-btn" class="mic-button bg-indigo-600 hover:bg-indigo-700 text-white">
-                            <i id="prac-mic-icon" class="ph-fill ph-microphone text-3xl transition-all"></i>
+                            <i id="prac-mic-icon" class="ph-fill ph-chats-circle text-3xl transition-all"></i>
                             <div class="text-left">
-                                <span id="prac-mic-text" class="block font-bold text-2xl">Read Aloud</span>
-                                <span id="prac-mic-subtext" class="block text-sm opacity-80 tracking-wider">Tap when ready</span>
+                                <span class="block font-bold text-2xl">Start Talking with AI</span>
+                                <span class="block text-sm opacity-80 tracking-wider">Tap to begin session</span>
                             </div>
                         </button>
-                         <div id="prac-voice-bars" class="h-10 flex items-center justify-center gap-2 opacity-0 transition-all duration-300 scale-95">
-                            <div class="voice-bar bg-indigo-400"></div><div class="voice-bar bg-indigo-400"></div><div class="voice-bar bg-indigo-400"></div><div class="voice-bar bg-indigo-400"></div><div class="voice-bar bg-indigo-400"></div>
-                        </div>
                     </div>
 
-                    <div id="practice-results-state" class="w-full flex flex-col gap-6 hidden opacity-0 transition-all duration-500 delay-100 scale-95">
+                    <div id="practice-results-state" class="hidden w-full flex flex-col gap-6 transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
                         <div class="flex-1 flex flex-col md:flex-row gap-4 items-stretch">
                             <div class="flex-1 bg-slate-50 rounded-2xl p-5 border border-slate-200 text-left flex flex-col shadow-sm">
                                 <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">1. What we heard</h3>
@@ -307,7 +296,50 @@
                                 </div>
                             </div>
                         </div>
-                        <button id="prac-reset-btn" class="tactile-touch w-full py-3 bg-white border-2 border-indigo-100 text-indigo-600 rounded-full font-bold text-lg hover:bg-indigo-50 transition-all shadow-sm">Try another phrase</button>
+                        <button id="prac-reset-btn" class="tactile-touch w-full py-3 bg-white border-2 border-indigo-100 text-indigo-600 rounded-full font-bold text-lg hover:bg-indigo-50 transition-all shadow-sm">Try another practice session</button>
+                    </div>
+
+
+                </section>
+            </div>
+        </div> <div id="clone-view" class="view-container hidden-view">
+            <header class="flex items-center justify-between mb-6 max-w 1000px mx-auto relative z-20">
+                <div class="avatar-container relative">
+                    <div class="avatar"><i class="ph-bold ph-user-circle"></i></div>
+                </div>
+                <h2 class="text-xl font-bold text-slate-800 tracking-tight">Voice Cloning</h2>
+            </header>
+
+             <div class="main-layout-grid items-center">
+                <section class="app-card card-centered max-w-3xl mx-auto md:max-h-[80vh]">
+                    
+                    <div class="mb-8">
+                        <div class="w-16 h-16 bg-rose-100 rounded-2xl flex items-center justify-center text-rose-600 mx-auto mb-4 shadow-sm border border-rose-50">
+                            <i class="ph-fill ph-wave-sawtooth text-3xl"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold text-slate-800 mb-2 tracking-tight">Clone Your Voice</h2>
+                        <p class="text-base text-slate-500 font-medium">Record samples to create your AI voice model.</p>
+                    </div>
+
+                    <div class="w-full max-w-lg flex flex-col gap-8 items-center">
+                         <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 w-full shadow-sm text-center">
+                            <p class="text-sm font-bold text-slate-500 mb-3 uppercase tracking-wider">Instructions:</p>
+                            <p class="text-base font-bold text-rose-900 leading-relaxed italic px-4">"This is a sample recording to capture the unique tone and characteristics of my voice for AI cloning. To get the best results, it is important to speak clearly and naturally, just as I would in a normal conversation with a friend. I am trying to maintain a steady pace throughout this entire paragraph."</p>
+                            <p class="text-sm text-slate-500 mt-4 font-medium">(Please talk for about 15 seconds)</p>
+                         </div>
+                        
+                        <button id="clone-record-btn" class="mic-button bg-rose-600 hover:bg-rose-700 text-white tactile-touch">
+                            <i class="ph-fill ph-microphone text-3xl"></i>
+                            <div class="text-left">
+                                <span class="block font-bold text-2xl">Record Sample</span>
+                                <span class="block text-sm opacity-80 tracking-wider">Tap and hold</span>
+                            </div>
+                        </button>
+
+                        <button id="clone-delete-btn" class="flex items-center gap-2 text-red-500 font-bold hover:bg-red-50 px-6 py-3 rounded-full transition-colors tactile-touch">
+                            <i class="ph-bold ph-trash text-xl"></i>
+                            Delete Voice Model
+                        </button>
                     </div>
 
                 </section>
@@ -315,10 +347,11 @@
         </div> </main>
 
 
-    <div class="bottom-nav-container">
+    <div class="bottom-nav-container stagger-4">
         <div class="bottom-nav">
             <div id="nav-conv-btn" class="nav-button active">Conversation</div>
             <div id="nav-prac-btn" class="nav-button inactive">Practice</div>
+            <div id="nav-clone-btn" class="nav-button inactive">Clone Voice</div>
         </div>
     </div>
 
@@ -326,7 +359,7 @@
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            // ================= CONFETTI LOGIC (Subtle Background) =================
+            // ================= CONFETTI LOGIC =================
             const confettiContainer = document.getElementById('confetti-container');
             const colors = ['#3B82F6', '#14B8A6', '#10B981', '#60A5FA', '#CBD5E1'];
             const numConfetti = 60; 
@@ -349,25 +382,79 @@
             // ================= NAVIGATION LOGIC =================
             const navConvBtn = document.getElementById('nav-conv-btn');
             const navPracBtn = document.getElementById('nav-prac-btn');
+            const navCloneBtn = document.getElementById('nav-clone-btn');
+            
             const conversationView = document.getElementById('conversation-view');
             const practiceView = document.getElementById('practice-view');
+            const cloneView = document.getElementById('clone-view');
 
-            function switchToConversation() {
+            function resetViews() {
+                [navConvBtn, navPracBtn, navCloneBtn].forEach(btn => {
+                    btn.classList.remove('active');
+                    btn.classList.add('inactive');
+                });
+                [conversationView, practiceView, cloneView].forEach(view => {
+                    view.classList.remove('active-view');
+                    view.classList.add('hidden-view');
+                });
+                document.body.classList.remove('mode-conversation', 'mode-practice', 'mode-clone');
+            }
+
+            navConvBtn.addEventListener('click', () => {
+                resetViews();
+                document.body.classList.add('mode-conversation');
                 navConvBtn.classList.add('active'); navConvBtn.classList.remove('inactive');
-                navPracBtn.classList.remove('active'); navPracBtn.classList.add('inactive');
                 conversationView.classList.add('active-view'); conversationView.classList.remove('hidden-view');
-                practiceView.classList.remove('active-view'); practiceView.classList.add('hidden-view');
-            }
+            });
 
-            function switchToPractice() {
+            navPracBtn.addEventListener('click', () => {
+                resetViews();
+                document.body.classList.add('mode-practice');
                 navPracBtn.classList.add('active'); navPracBtn.classList.remove('inactive');
-                navConvBtn.classList.remove('active'); navConvBtn.classList.add('inactive');
                 practiceView.classList.add('active-view'); practiceView.classList.remove('hidden-view');
-                conversationView.classList.remove('active-view'); conversationView.classList.add('hidden-view');
-            }
+            });
 
-            navConvBtn.addEventListener('click', switchToConversation);
-            navPracBtn.addEventListener('click', switchToPractice);
+            navCloneBtn.addEventListener('click', () => {
+                resetViews();
+                document.body.classList.add('mode-clone');
+                navCloneBtn.classList.add('active'); navCloneBtn.classList.remove('inactive');
+                cloneView.classList.add('active-view'); cloneView.classList.remove('hidden-view');
+            });
+
+
+            // ================= PRACTICE MODE LOGIC =================
+            const practiceVoiceSelect = document.getElementById('practice-voice-select');
+            const selectedVoiceDisplay = document.getElementById('selected-voice-display');
+            const practiceInputState = document.getElementById('practice-input-state');
+            const practiceResultsState = document.getElementById('practice-results-state');
+            const pracMicBtn = document.getElementById('prac-mic-btn');
+            const pracResetBtn = document.getElementById('prac-reset-btn');
+
+            // Update dropdown display on change
+            practiceVoiceSelect.addEventListener('change', function() {
+                const selectedText = this.options[this.selectedIndex].text;
+                let iconClass = 'ph-user';
+                if (this.value === 'trump' || this.value === 'biden') iconClass = 'ph-user-focus';
+                if (this.value === 'ronaldo') iconClass = 'ph-soccer-ball';
+                if (this.value === 'spongebob') iconClass = 'ph-smiley';
+                selectedVoiceDisplay.innerHTML = `<i class="ph-fill ${iconClass}"></i> ${selectedText}`;
+            });
+
+            // Simulate Practice Session on Mic Click
+            pracMicBtn.addEventListener('click', () => {
+                pracMicBtn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-3xl"></i><div class="text-left"><span class="block font-bold text-2xl">Connecting...</span><span class="block text-sm opacity-80 tracking-wider">Please wait</span></div>';
+                setTimeout(() => {
+                    practiceInputState.classList.add('hidden');
+                    practiceResultsState.classList.remove('hidden');
+                    pracMicBtn.innerHTML = '<i id="prac-mic-icon" class="ph-fill ph-chats-circle text-3xl transition-all"></i><div class="text-left"><span class="block font-bold text-2xl">Start Talking with AI</span><span class="block text-sm opacity-80 tracking-wider">Tap to begin session</span></div>';
+                }, 1500);
+            });
+
+            // Reset back to input state
+            pracResetBtn.addEventListener('click', () => {
+                 practiceResultsState.classList.add('hidden');
+                 practiceInputState.classList.remove('hidden');
+            });
 
 
             // ================= CONVERSATION MODE LOGIC =================
@@ -380,16 +467,32 @@
             const historySource = document.getElementById('history-source');
             const historyTarget = document.getElementById('history-target');
             const convLangSelect = document.getElementById('conv-lang-select');
-            const convLangSummary = document.getElementById('conv-lang-summary');
             const targetTranslationLabel = document.getElementById('target-translation-label');
+            
+            const targetLangFlag = document.getElementById('target-lang-flag');
+            const targetLangNameSpan = document.getElementById('target-lang-name');
 
 
             // FUNCTION TO UPDATE UI WHEN LANGUAGE DROPDOWN CHANGES
             function updateConvLanguageUI() {
-                const selectedText = convLangSelect.options[convLangSelect.selectedIndex].text;
-                const targetLangName = selectedText.split(' ')[0];
-                convLangSummary.innerHTML = `English <i class="ph-bold ph-arrow-right text-xs mx-1"></i> <span class="text-green-500">${targetLangName}</span>`;
-                targetTranslationLabel.textContent = `TRANSLATION (${targetLangName.toUpperCase()})`;
+                const selectedLangCode = convLangSelect.value;
+                
+                let flagUrl = "";
+                let langName = "";
+
+                if (selectedLangCode === 'es') {
+                    flagUrl = "https://flagicons.lipis.dev/flags/4x3/es.svg";
+                    langName = "Spanish";
+                } else if (selectedLangCode === 'fr') {
+                    flagUrl = "https://flagicons.lipis.dev/flags/4x3/fr.svg";
+                    langName = "French";
+                }
+                
+                targetLangFlag.src = flagUrl;
+                targetLangFlag.alt = `${langName} Flag`;
+                targetLangNameSpan.textContent = langName;
+
+                targetTranslationLabel.textContent = `TRANSLATION (${langName.toUpperCase()})`;
             }
 
             convLangSelect.addEventListener('change', updateConvLanguageUI);
@@ -420,6 +523,11 @@
                     demoResponse = "Bonjour, comment allez-vous ?";
                 }
                 
+                if (historySource.querySelector('.text-slate-400')) {
+                    historySource.innerHTML = '';
+                    historyTarget.innerHTML = '';
+                }
+                
                 const newSource = document.createElement('p');
                 newSource.className = "text-slate-700 font-bold bg-white p-3 rounded-xl shadow-sm border border-slate-100 animate-pulse";
                 newSource.textContent = "Hello, how are you?";
@@ -440,61 +548,11 @@
             convMicBtn.addEventListener('click', handleConvMicToggle);
             
             convClearBtn.addEventListener('click', () => {
-                historySource.innerHTML = '<p class="text-slate-400 italic text-center">Tap the mic & start speaking...</p>';
-                historyTarget.innerHTML = '<p class="text-green-600/50 italic text-center">Translation appears here...</p>';
+                historySource.innerHTML = '<p class="text-slate-400 italic text-center px-8">Your speech will appear here...</p>';
+                historyTarget.innerHTML = '<p class="text-green-600/50 italic text-center px-8">...and the translation will appear here.</p>';
             });
 
-
-            // ================= PRACTICE MODE FLOW LOGIC =================
-            const pracMicBtn = document.getElementById('prac-mic-btn');
-            const pracMicIcon = document.getElementById('prac-mic-icon');
-            const pracMicText = document.getElementById('prac-mic-text');
-            const pracMicSubtext = document.getElementById('prac-mic-subtext');
-            const pracVoiceBars = document.getElementById('prac-voice-bars');
-            const practiceInputState = document.getElementById('practice-input-state');
-            const practiceResultsState = document.getElementById('practice-results-state');
-            const pracResetBtn = document.getElementById('prac-reset-btn');
-
-            let isPracMicActive = false;
-
-            function handlePracMicClick() {
-                if (!isPracMicActive) {
-                    isPracMicActive = true;
-                    pracMicBtn.style.backgroundColor = 'var(--accent-blue)';
-                    pracMicIcon.classList.add('animate-pulse');
-                    pracMicText.textContent = "Listening..."; pracMicSubtext.textContent = "Tap to finish";
-                    pracVoiceBars.classList.remove('opacity-0', 'scale-95'); pracVoiceBars.classList.add('animate-voice', 'scale-100');
-                } else {
-                    isPracMicActive = false;
-                    practiceInputState.classList.add('opacity-0', '-translate-y-5', 'scale-95');
-                    setTimeout(() => {
-                            practiceInputState.classList.add('hidden');
-                            practiceResultsState.classList.remove('hidden');
-                            setTimeout(() => {
-                                practiceResultsState.classList.remove('opacity-0', 'scale-95');
-                            }, 50);
-                    }, 300);
-                }
-            }
-
-            function resetPractice() {
-                practiceResultsState.classList.add('opacity-0', 'scale-95');
-                setTimeout(() => {
-                    practiceResultsState.classList.add('hidden');
-                    practiceInputState.classList.remove('hidden');
-                    pracMicBtn.style.backgroundColor = 'var(--accent-blue)'; /* Reset color */
-                    pracMicIcon.classList.remove('animate-pulse');
-                    pracMicText.textContent = "Read Aloud"; pracMicSubtext.textContent = "Tap when ready";
-                    pracVoiceBars.classList.add('opacity-0', 'scale-95'); pracVoiceBars.classList.remove('animate-voice', 'scale-100');
-                    setTimeout(() => {
-                        practiceInputState.classList.remove('opacity-0', '-translate-y-5', 'scale-95');
-                    }, 50);
-                }, 300);
-            }
-
-            pracMicBtn.addEventListener('click', handlePracMicClick);
-            pracResetBtn.addEventListener('click', resetPractice);
-
+            // Initialize UI on load
             updateConvLanguageUI();
         });
     </script>
