@@ -1,716 +1,1311 @@
 <!DOCTYPE html>
 <html lang="en" class="h-full">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    />
     <title>Language Converter AI - Final with 15s Transcript</title>
-    
+
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
+
     <style>
-        /* ================= CSS STYLES ================= */
-        /* --- CSS VARIABLES --- */
-        :root {
-            --bg-color: #F8FAFC;
-            --card-bg: #FFFFFF;
-            --card-hover-bg: #F8FAFC;
-            --text-primary: #1A1A1A;
-            --text-secondary: #6B7280;
-            --accent-blue: #3B82F6;
-            --accent-teal: #14B8A6;
-            --accent-indigo: #6366F1;
-            --accent-rose: #E11D48;
-            --button-dark: #1F2937;
-            --border-light: #E2E8F0;
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
-            --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
-            --radius-lg: 24px;
+      /* ================= CSS STYLES ================= */
+      /* --- CSS VARIABLES --- */
+      :root {
+        --bg-color: #f8fafc;
+        --card-bg: #ffffff;
+        --card-hover-bg: #f8fafc;
+        --text-primary: #1a1a1a;
+        --text-secondary: #6b7280;
+        --accent-blue: #3b82f6;
+        --accent-teal: #14b8a6;
+        --accent-indigo: #6366f1;
+        --accent-rose: #e11d48;
+        --button-dark: #1f2937;
+        --border-light: #e2e8f0;
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08),
+          0 2px 4px -1px rgba(0, 0, 0, 0.04);
+        --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.08),
+          0 8px 10px -6px rgba(0, 0, 0, 0.02);
+        --radius-lg: 24px;
+      }
+
+      /* --- BASE STYLES --- */
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+          Helvetica, Arial, sans-serif;
+        background-color: var(--bg-color);
+        margin: 0;
+        min-height: 100vh;
+        position: relative;
+      }
+
+      /* --- ENTRANCE ANIMATIONS --- */
+      @keyframes slideDownFade {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
         }
-
-        /* --- BASE STYLES --- */
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-            background-color: var(--bg-color); margin: 0; min-height: 100vh; position: relative;
+        to {
+          opacity: 1;
+          transform: translateY(0);
         }
+      }
+      @keyframes slideUpFade {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .stagger-1 {
+        animation: slideDownFade 0.6s ease-out backwards;
+      }
+      .stagger-2 {
+        animation: slideUpFade 0.6s ease-out backwards 0.2s;
+      }
+      .stagger-3 {
+        animation: slideUpFade 0.6s ease-out backwards 0.3s;
+      }
+      .stagger-4 {
+        animation: slideUpFade 0.6s ease-out backwards 0.5s;
+      }
 
-        /* --- ENTRANCE ANIMATIONS --- */
-        @keyframes slideDownFade { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-        @keyframes slideUpFade { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-        .stagger-1 { animation: slideDownFade 0.6s ease-out backwards; }
-        .stagger-2 { animation: slideUpFade 0.6s ease-out backwards 0.2s; }
-        .stagger-3 { animation: slideUpFade 0.6s ease-out backwards 0.3s; }
-        .stagger-4 { animation: slideUpFade 0.6s ease-out backwards 0.5s; }
+      /* --- CONFETTI STYLES --- */
+      #confetti-container {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+        overflow: hidden;
+      }
+      .confetti-piece {
+        position: absolute;
+        border-radius: 2px;
+      }
 
-        /* --- CONFETTI STYLES --- */
-        #confetti-container { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
-        .confetti-piece { position: absolute; border-radius: 2px; }
-
-        /* --- VIEW SWITCHING UTILITIES --- */
+      /* --- VIEW SWITCHING UTILITIES --- */
+      .view-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        padding: 1rem;
+        z-index: 10;
+        pointer-events: none;
+      }
+      @media (min-width: 768px) {
         .view-container {
-            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); padding: 1rem; z-index: 10; pointer-events: none; 
+          padding: 2rem;
         }
-        @media (min-width: 768px) { .view-container { padding: 2rem; } }
-        .active-view { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; filter: blur(0px); }
-        .hidden-view { opacity: 0; transform: translateY(20px) scale(0.98); filter: blur(4px); }
-        
-        /* Simple hide utility for practice states */
-        .hidden { display: none; }
+      }
+      .active-view {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+        pointer-events: auto;
+        filter: blur(0px);
+      }
+      .hidden-view {
+        opacity: 0;
+        transform: translateY(20px) scale(0.98);
+        filter: blur(4px);
+      }
 
-        /* --- MAIN LAYOUT CONTAINER --- */
+      /* Simple hide utility for practice states */
+      .hidden {
+        display: none;
+      }
+
+      /* --- MAIN LAYOUT CONTAINER --- */
+      .main-layout-grid {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        max-width: 1000px;
+        width: 100%;
+        margin: 0 auto;
+        height: 100%;
+        align-items: stretch;
+      }
+      @media (max-width: 768px) {
         .main-layout-grid {
-            display: flex; justify-content: center; gap: 2rem; max-width: 1000px; width: 100%;
-            margin: 0 auto; height: 100%; align-items: stretch;
+          flex-direction: column;
+          height: auto;
         }
-        @media (max-width: 768px) { .main-layout-grid { flex-direction: column; height: auto; } }
+      }
 
-        /* --- THE CARD STYLES --- */
-        .app-card {
-            background-color: var(--card-bg); border-radius: var(--radius-lg); box-shadow: var(--shadow-md);
-            padding: 2.5rem; flex: 1; display: flex; flex-direction: column;
-            border: 1px solid var(--border-light); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            overflow: hidden; position: relative;
+      /* --- THE CARD STYLES --- */
+      .app-card {
+        background-color: var(--card-bg);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow-md);
+        padding: 2.5rem;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--border-light);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        position: relative;
+      }
+      @media (hover: hover) {
+        .app-card:hover {
+          background-color: var(--card-hover-bg);
+          transform: translateY(-8px);
+          box-shadow: var(--shadow-lg);
+          border-color: #cbd5e1;
         }
-        @media (hover: hover) {
-            .app-card:hover { background-color: var(--card-hover-bg); transform: translateY(-8px); box-shadow: var(--shadow-lg); border-color: #CBD5E1; }
-        }
-        .card-centered { align-items: center; text-align: center; justify-content: center; }
+      }
+      .card-centered {
+        align-items: center;
+        text-align: center;
+        justify-content: center;
+      }
 
-        /* --- AVATAR DYNAMIC COLORS --- */
-        .avatar {
-            width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 24px; color: white; box-shadow: var(--shadow-sm); transition: background 0.5s ease;
-        }
-        body.mode-conversation .avatar { background: linear-gradient(135deg, #60A5FA, var(--accent-blue)); }
-        body.mode-practice .avatar { background: linear-gradient(135deg, #A5B4FC, var(--accent-indigo)); }
-        body.mode-clone .avatar { background: linear-gradient(135deg, #FDA4AF, var(--accent-rose)); }
+      /* --- AVATAR DYNAMIC COLORS --- */
+      .avatar {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: white;
+        box-shadow: var(--shadow-sm);
+        transition: background 0.5s ease;
+      }
+      body.mode-conversation .avatar {
+        background: linear-gradient(135deg, #60a5fa, var(--accent-blue));
+      }
+      body.mode-practice .avatar {
+        background: linear-gradient(135deg, #a5b4fc, var(--accent-indigo));
+      }
+      body.mode-clone .avatar {
+        background: linear-gradient(135deg, #fda4af, var(--accent-rose));
+      }
 
+      /* --- COMPONENT STYLES --- */
+      .mic-button {
+        background-color: var(--button-dark);
+        color: white;
+        width: 100%;
+        padding: 1rem;
+        border-radius: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 1rem;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: var(--shadow-md);
+        position: relative;
+        overflow: hidden;
+        z-index: 1;
+      }
+      .mic-button:hover {
+        transform: scale(1.02);
+        box-shadow: var(--shadow-lg);
+      }
+      .mic-button:active {
+        transform: scale(0.98);
+      }
+      .mic-button.active-state {
+        background: linear-gradient(
+          to right,
+          var(--accent-blue),
+          var(--accent-teal)
+        );
+      }
 
-        /* --- COMPONENT STYLES --- */
-        .mic-button {
-            background-color: var(--button-dark); color: white; width: 100%; padding: 1rem;
-            border-radius: 100px; display: flex; align-items: center; justify-content: center;
-            gap: 1rem; cursor: pointer; transition: all 0.2s ease; box-shadow: var(--shadow-md);
-            position: relative; overflow: hidden; z-index: 1;
+      /* Voice Bar Animations */
+      .voice-bar {
+        width: 4px;
+        height: 4px;
+        background-color: var(--text-secondary);
+        border-radius: 2px;
+        opacity: 0.3;
+        transition: all 0.2s ease;
+      }
+      .animate-voice .voice-bar {
+        opacity: 1 !important;
+        background-color: var(--accent-blue) !important;
+      }
+      .animate-voice .voice-bar:nth-child(1) {
+        animation: bounceBar 0.8s infinite 0.1s;
+      }
+      .animate-voice .voice-bar:nth-child(2) {
+        animation: bounceBar 0.6s infinite 0.3s;
+      }
+      .animate-voice .voice-bar:nth-child(3) {
+        animation: bounceBar 0.7s infinite 0s;
+      }
+      .animate-voice .voice-bar:nth-child(4) {
+        animation: bounceBar 0.5s infinite 0.4s;
+      }
+      .animate-voice .voice-bar:nth-child(5) {
+        animation: bounceBar 0.6s infinite 0.2s;
+      }
+      @keyframes bounceBar {
+        0%,
+        100% {
+          height: 24px;
         }
-        .mic-button:hover { transform: scale(1.02); box-shadow: var(--shadow-lg); }
-        .mic-button:active { transform: scale(0.98); }
-        .mic-button.active-state { background: linear-gradient(to right, var(--accent-blue), var(--accent-teal)); }
+        50% {
+          height: 40px;
+        }
+      }
 
-        /* Voice Bar Animations */
-        .voice-bar { width: 4px; height: 4px; background-color: var(--text-secondary); border-radius: 2px; opacity: 0.3; transition: all 0.2s ease; }
-        .animate-voice .voice-bar { opacity: 1 !important; background-color: var(--accent-blue) !important; }
-        .animate-voice .voice-bar:nth-child(1) { animation: bounceBar 0.8s infinite 0.1s; }
-        .animate-voice .voice-bar:nth-child(2) { animation: bounceBar 0.6s infinite 0.3s; }
-        .animate-voice .voice-bar:nth-child(3) { animation: bounceBar 0.7s infinite 0.0s; }
-        .animate-voice .voice-bar:nth-child(4) { animation: bounceBar 0.5s infinite 0.4s; }
-        .animate-voice .voice-bar:nth-child(5) { animation: bounceBar 0.6s infinite 0.2s; }
-        @keyframes bounceBar { 0%, 100% { height: 24px; } 50% { height: 40px; } }
+      .transcript-box {
+        flex: 1;
+        background-color: var(--bg-color);
+        border-radius: var(--radius-md);
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        border: 1px solid var(--border-light);
+        transition: border-color 0.3s ease;
+      }
+      .app-card:hover .transcript-box {
+        border-color: #cbd5e1;
+      }
+      .translation-bubble {
+        background-color: var(--accent-teal);
+        color: white;
+        font-weight: 700;
+        padding: 0.75rem 1rem;
+        border-radius: 1rem;
+        box-shadow: var(--shadow-sm);
+      }
 
-        .transcript-box {
-            flex: 1; background-color: var(--bg-color); border-radius: var(--radius-md);
-            padding: 1.5rem; margin-bottom: 1.5rem; display: flex; flex-direction: column;
-            border: 1px solid var(--border-light); transition: border-color 0.3s ease;
-        }
-        .app-card:hover .transcript-box { border-color: #CBD5E1; }
-        .translation-bubble {
-            background-color: var(--accent-teal); color: white; font-weight: 700;
-            padding: 0.75rem 1rem; border-radius: 1rem; box-shadow: var(--shadow-sm);
-        }
+      /* Bottom Nav Specifics */
+      .bottom-nav-container {
+        position: fixed;
+        bottom: 1.5rem;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 450px;
+        z-index: 50;
+      }
+      .bottom-nav {
+        background-color: var(--card-bg);
+        padding: 0.5rem;
+        border-radius: 100px;
+        box-shadow: var(--shadow-lg);
+        display: flex;
+        gap: 0.5rem;
+        border: 1px solid var(--border-light);
+      }
+      .nav-button {
+        padding: 0.75rem 1rem;
+        border-radius: 100px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex: 1;
+        text-align: center;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+        font-size: 0.9rem;
+      }
+      .nav-button.active {
+        background-color: var(--bg-color);
+        color: var(--text-primary);
+        box-shadow: var(--shadow-sm);
+      }
+      .nav-button.inactive {
+        color: var(--text-secondary);
+        background-color: transparent;
+      }
+      .nav-button.inactive:hover {
+        background-color: rgba(0, 0, 0, 0.03);
+      }
 
-        /* Bottom Nav Specifics */
-        .bottom-nav-container { position: fixed; bottom: 1.5rem; left: 50%; transform: translateX(-50%); width: 90%; max-width: 450px; z-index: 50; }
-        .bottom-nav {
-            background-color: var(--card-bg); padding: 0.5rem; border-radius: 100px;
-            box-shadow: var(--shadow-lg); display: flex; gap: 0.5rem; border: 1px solid var(--border-light);
-        }
-        .nav-button {
-            padding: 0.75rem 1rem; border-radius: 100px; font-weight: 600; cursor: pointer; transition: all 0.2s ease; flex: 1; text-align: center; white-space: nowrap; text-overflow: ellipsis; overflow: hidden; font-size: 0.9rem;
-        }
-        .nav-button.active { background-color: var(--bg-color); color: var(--text-primary); box-shadow: var(--shadow-sm); }
-        .nav-button.inactive { color: var(--text-secondary); background-color: transparent; }
-        .nav-button.inactive:hover { background-color: rgba(0,0,0,0.03); }
-
-        /* Utilities */
-        .tactile-touch { transition: transform 0.1s; cursor: pointer; }
-        .tactile-touch:active { transform: scale(0.95); }
-        .no-scrollbar::-webkit-scrollbar { display: none; }
-        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      /* Utilities */
+      .tactile-touch {
+        transition: transform 0.1s;
+        cursor: pointer;
+      }
+      .tactile-touch:active {
+        transform: scale(0.95);
+      }
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
     </style>
-</head>
-<body class="h-full overflow-hidden bg-[#F8FAFC] mode-conversation">
-
+  </head>
+  <body class="h-full overflow-hidden bg-[#F8FAFC] mode-conversation">
     <div id="confetti-container"></div>
 
-    <div class="fixed bottom-4 right-4 z-50 flex items-center gap-2 bg-white/80 backdrop-blur-md p-2 pr-4 rounded-full shadow-sm border border-slate-100 transition-all hover:shadow-md cursor-default animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <img src="https://placehold.co/40x40/3B82F6/ffffff?text=MH" alt="Mad Hacks Logo" class="w-8 h-8 rounded-full">
-        <span class="font-bold text-slate-700 text-sm">Language Converter AI</span>
+    <div
+      class="fixed bottom-4 right-4 z-50 flex items-center gap-2 bg-white/80 backdrop-blur-md p-2 pr-4 rounded-full shadow-sm border border-slate-100 transition-all hover:shadow-md cursor-default animate-in fade-in slide-in-from-bottom-4 duration-700"
+    >
+      <img
+        src="https://placehold.co/40x40/3B82F6/ffffff?text=MH"
+        alt="Mad Hacks Logo"
+        class="w-8 h-8 rounded-full"
+      />
+      <span class="font-bold text-slate-700 text-sm"
+        >Language Converter AI</span
+      >
     </div>
 
     <main class="relative h-full w-full overflow-hidden pb-28">
-        
-        <div id="conversation-view" class="view-container active-view">
-            <header class="flex items-center justify-between mb-6 max-w 1000px mx-auto stagger-1 relative z-20">
-                 <div class="avatar-container relative">
-                    <div class="avatar"><i class="ph-bold ph-user-circle"></i></div>
-                    <div class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-[2px] border-white animate-pulse"></div>
-                </div>
-                <div class="flex items-center gap-3 bg-white/80 backdrop-blur-sm p-2 rounded-2xl shadow-sm border border-blue-100/50">
-                    <div class="flex items-center gap-1 text-orange-500 font-bold text-sm px-2"><i class="ph-fill ph-fire text-lg"></i> 3 Day Streak</div>
-                    <div class="w-8 h-8 relative flex items-center justify-center">
-                        <svg class="w-full h-full rotate-[-90deg]" viewBox="0 0 36 36"><path class="text-slate-200" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3"/><path class="text-blue-500" stroke-dasharray="75, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg>
-                        <span class="absolute text-[10px] font-bold text-blue-600">75%</span>
-                    </div>
-                </div>
-            </header>
-
-            <div class="main-layout-grid">
-                <section class="app-card card-centered md:max-h-[80vh] stagger-2">
-                    <h1 class="text-2xl md:text-3xl font-bold text-slate-800 mb-2 tracking-tight">Conversation Mode</h1>
-                    <p class="text-base text-slate-500 font-medium mb-8">Tap the mic to start speaking.</p>
-
-                    <div class="w-full max-w-xs flex flex-col gap-4 items-center relative z-10 mb-2">
-                        <div class="w-full flex items-center justify-center bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm transition-colors hover:border-blue-200 relative">
-                            <select id="conv-lang-select" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20">
-                                <option value="es">Spanish</option>
-                                <option value="fr">French</option>
-                            </select>
-                            <div class="flex items-center gap-2 text-blue-600 pointer-events-none z-10">
-                                <span class="text-slate-500 font-medium text-sm mr-1">Talk in:</span>
-                                <img id="target-lang-flag" src="https://flagicons.lipis.dev/flags/4x3/es.svg" alt="Target Flag" class="w-5 h-4 object-cover rounded-sm shadow-sm">
-                                <span id="target-lang-name" class="font-bold text-sm">Spanish</span>
-                                <i class="ph-bold ph-caret-down"></i>
-                            </div>
-                        </div>
-
-                        <button id="conv-mic-btn" class="mic-button group">
-                            <i id="conv-mic-icon" class="ph-fill ph-microphone text-2xl transition-all"></i>
-                            <div class="text-left">
-                                <span id="conv-mic-text" class="block font-bold text-lg">Tap to speak</span>
-                                <span id="conv-mic-subtext" class="block text-xs opacity-70">VISUAL DEMO ONLY</span>
-                            </div>
-                        </button>
-                        
-                        <div id="conv-voice-bars" class="mt-2 h-10 flex items-center justify-center gap-1.5">
-                            <div class="voice-bar"></div><div class="voice-bar"></div><div class="voice-bar"></div><div class="voice-bar"></div><div class="voice-bar"></div>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="app-card md:max-h-[80vh] stagger-3">
-                    <div class="mb-4 flex items-center justify-between">
-                        <div>
-                            <h2 class="text-xl font-bold text-slate-800 tracking-tight">Live Transcript</h2>
-                        </div>
-                        <i class="ph-bold ph-trash text-slate-400 text-xl cursor-pointer hover:text-red-500 transition-colors p-2 tactile-touch" id="conv-clear-btn"></i>
-                    </div>
-
-                    <div class="flex-1 flex flex-col gap-4 overflow-hidden">
-                        <div class="transcript-box">
-                            <span class="text-xs font-bold text-slate-500 tracking-wider mb-4 block">YOU SAID</span>
-                            <div id="history-source" class="flex-1 overflow-y-auto no-scrollbar flex flex-col justify-center gap-3">
-                                <p class="text-slate-400 italic text-center px-8">Your speech will appear here...</p>
-                            </div>
-                        </div>
-                        <div class="transcript-box mb-0">
-                            <span id="target-translation-label" class="text-xs font-bold text-green-600 tracking-wider mb-4 block">CORRECT (SPANISH)</span>
-                            <div id="history-target" class="flex-1 overflow-y-auto no-scrollbar flex flex-col justify-center gap-3">
-                                <p class="text-green-600/50 italic text-center px-8">...and the correction will appear here.</p>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+      <div id="conversation-view" class="view-container active-view">
+        <header
+          class="flex items-center justify-between mb-6 max-w 1000px mx-auto stagger-1 relative z-20"
+        >
+          <div class="avatar-container relative">
+            <div class="avatar"><i class="ph-bold ph-user-circle"></i></div>
+            <div
+              class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-[2px] border-white animate-pulse"
+            ></div>
+          </div>
+          <div
+            class="flex items-center gap-3 bg-white/80 backdrop-blur-sm p-2 rounded-2xl shadow-sm border border-blue-100/50"
+          >
+            <div
+              class="flex items-center gap-1 text-orange-500 font-bold text-sm px-2"
+            >
+              <i class="ph-fill ph-fire text-lg"></i> 3 Day Streak
             </div>
-        </div> <div id="practice-view" class="view-container hidden-view">
-             <header class="flex items-center justify-between mb-6 max-w 1000px mx-auto relative z-20">
-                <div class="avatar-container relative">
-                    <div class="avatar"><i class="ph-bold ph-user-circle"></i></div>
-                </div>
-                <h2 class="text-xl font-bold text-slate-800 tracking-tight">Practice Mode</h2>
-            </header>
-
-             <div class="main-layout-grid items-center">
-                <section class="app-card card-centered max-w-3xl mx-auto md:max-h-[80vh]">
-                    
-                    <div class="mb-6">
-                        <div class="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 mx-auto mb-4 shadow-sm border border-indigo-50">
-                            <i class="ph-fill ph-speaker-high text-3xl"></i>
-                        </div>
-                        <h2 class="text-3xl font-bold text-slate-800 mb-2 tracking-tight">Select a Voice Partner</h2>
-                        <p class="text-base text-slate-500 font-medium">Choose who you want to practice with.</p>
-                    </div>
-
-                    <div id="practice-input-state" class="w-full max-w-lg flex flex-col gap-6 items-center transition-all duration-500">
-                        <div class="w-full mb-4 relative z-20">
-                            <div class="w-full flex items-center justify-between bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-sm transition-all hover:border-indigo-300 hover:shadow-md cursor-pointer relative">
-                                <span id="selected-voice-display" class="font-bold text-indigo-700 flex items-center gap-2">
-                                    <i class="ph-fill ph-user"></i> Your Own Voice
-                                </span>
-                                <i class="ph-bold ph-caret-down text-indigo-500"></i>
-                                <select id="practice-voice-select" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer">
-                                    <option value="own_voice">Your Own Voice</option>
-                                    <option value="trump">Donald Trump</option>
-                                    <option value="ronaldo">Cristiano Ronaldo</option>
-                                    <option value="spongebob">SpongeBob SquarePants</option>
-                                    <option value="biden">Joe Biden</option>
-                                </select>
-                            </div>
-                        </div>
-
-                        <button id="prac-mic-btn" class="mic-button bg-indigo-600 hover:bg-indigo-700 text-white">
-                            <i id="prac-mic-icon" class="ph-fill ph-chats-circle text-3xl transition-all"></i>
-                            <div class="text-left">
-                                <span class="block font-bold text-2xl">Start Talking with AI</span>
-                                <span class="block text-sm opacity-80 tracking-wider">Tap to begin session</span>
-                            </div>
-                        </button>
-                    </div>
-
-                    <div id="practice-results-state" class="hidden w-full flex flex-col gap-6 transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
-                        <div class="flex-1 flex flex-col md:flex-row gap-4 items-stretch">
-                            <div class="flex-1 bg-slate-50 rounded-2xl p-5 border border-slate-200 text-left flex flex-col shadow-sm">
-                                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">1. What we heard</h3>
-                                <div class="flex-1 bg-white rounded-xl p-4 flex flex-col items-center justify-center shadow-sm border border-slate-100 gap-3">
-                                    <p class="text-lg font-bold text-slate-700 text-center leading-tight">"Buenos dias amigo"</p>
-                                    <button class="tactile-touch flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-full font-bold transition-colors text-xs">
-                                        <i class="ph-bold ph-play"></i> Play back
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="flex-1 bg-amber-50 rounded-2xl p-5 border border-amber-200 text-left flex flex-col shadow-sm">
-                                <h3 class="text-xs font-bold text-amber-600 uppercase tracking-widest mb-3">2. Analysis</h3>
-                                <div class="flex-1 bg-white rounded-xl p-4 flex flex-col items-center justify-center shadow-sm gap-3 border border-amber-100">
-                                    <div class="flex items-center gap-2"><span class="text-amber-600 font-bold text-base">Score:</span><span class="font-black text-3xl text-amber-500">85%</span></div>
-                                    <p class="text-sm font-bold text-amber-800 text-center bg-amber-100 px-4 py-2 rounded-xl leading-tight">Don't forget the accent on "días".</p>
-                                </div>
-                            </div>
-                            <div class="flex-1 bg-emerald-50 rounded-2xl p-5 border border-emerald-200 text-left flex flex-col shadow-sm">
-                                <h3 class="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-3">3. The Correct Way</h3>
-                                <div class="flex-1 bg-white rounded-xl p-4 flex flex-col items-center justify-center shadow-sm gap-3 border border-emerald-100">
-                                    <p class="text-xl font-black text-emerald-700 text-center leading-tight">"Buenos días, amigo."</p>
-                                    <button class="tactile-touch flex items-center gap-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-4 py-2 rounded-full font-bold transition-colors text-sm">
-                                        <i class="ph-bold ph-speaker-high"></i> Listen
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                        <button id="prac-reset-btn" class="tactile-touch w-full py-3 bg-white border-2 border-indigo-100 text-indigo-600 rounded-full font-bold text-lg hover:bg-indigo-50 transition-all shadow-sm">Try another practice session</button>
-                    </div>
-
-
-                </section>
+            <div class="w-8 h-8 relative flex items-center justify-center">
+              <svg class="w-full h-full rotate-[-90deg]" viewBox="0 0 36 36">
+                <path
+                  class="text-slate-200"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="3"
+                />
+                <path
+                  class="text-blue-500"
+                  stroke-dasharray="75, 100"
+                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="3"
+                  stroke-linecap="round"
+                />
+              </svg>
+              <span class="absolute text-[10px] font-bold text-blue-600"
+                >75%</span
+              >
             </div>
-        </div> <div id="clone-view" class="view-container hidden-view">
-            <header class="flex items-center justify-between mb-6 max-w 1000px mx-auto relative z-20">
-                <div class="avatar-container relative">
-                    <div class="avatar"><i class="ph-bold ph-user-circle"></i></div>
+          </div>
+        </header>
+
+        <div class="main-layout-grid">
+          <section class="app-card card-centered md:max-h-[80vh] stagger-2">
+            <h1
+              class="text-2xl md:text-3xl font-bold text-slate-800 mb-2 tracking-tight"
+            >
+              Conversation Mode
+            </h1>
+            <p class="text-base text-slate-500 font-medium mb-8">
+              Tap the mic to start speaking.
+            </p>
+
+            <div
+              class="w-full max-w-xs flex flex-col gap-4 items-center relative z-10 mb-2"
+            >
+              <div
+                class="w-full flex items-center justify-center bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm transition-colors hover:border-blue-200 relative"
+              >
+                <select
+                  id="conv-lang-select"
+                  class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
+                >
+                  <option value="es">Spanish</option>
+                  <option value="fr">French</option>
+                </select>
+                <div
+                  class="flex items-center gap-2 text-blue-600 pointer-events-none z-10"
+                >
+                  <span class="text-slate-500 font-medium text-sm mr-1"
+                    >Talk in:</span
+                  >
+                  <img
+                    id="target-lang-flag"
+                    src="https://flagicons.lipis.dev/flags/4x3/es.svg"
+                    alt="Target Flag"
+                    class="w-5 h-4 object-cover rounded-sm shadow-sm"
+                  />
+                  <span id="target-lang-name" class="font-bold text-sm"
+                    >Spanish</span
+                  >
+                  <i class="ph-bold ph-caret-down"></i>
                 </div>
-                <h2 class="text-xl font-bold text-slate-800 tracking-tight">Voice Cloning</h2>
-            </header>
+              </div>
 
-             <div class="main-layout-grid items-center">
-                <section class="app-card card-centered max-w-3xl mx-auto md:max-h-[80vh]">
-                    
-                    <div class="mb-8">
-                        <div class="w-16 h-16 bg-rose-100 rounded-2xl flex items-center justify-center text-rose-600 mx-auto mb-4 shadow-sm border border-rose-50">
-                            <i class="ph-fill ph-wave-sawtooth text-3xl"></i>
-                        </div>
-                        <h2 class="text-3xl font-bold text-slate-800 mb-2 tracking-tight">Clone Your Voice</h2>
-                        <p class="text-base text-slate-500 font-medium">Record samples to create your AI voice model.</p>
-                    </div>
+              <button id="conv-mic-btn" class="mic-button group">
+                <i
+                  id="conv-mic-icon"
+                  class="ph-fill ph-microphone text-2xl transition-all"
+                ></i>
+                <div class="text-left">
+                  <span id="conv-mic-text" class="block font-bold text-lg"
+                    >Tap to speak</span
+                  >
+                  <span id="conv-mic-subtext" class="block text-xs opacity-70"
+                    >Tap and talk</span
+                  >
+                </div>
+              </button>
 
-                    <div class="w-full max-w-lg flex flex-col gap-8 items-center">
-                         <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200 w-full shadow-sm text-center">
-                            <p class="text-sm font-bold text-slate-500 mb-3 uppercase tracking-wider">Instructions:</p>
-                            <p class="text-base font-bold text-rose-900 leading-relaxed italic px-4">"The quick brown fox jumps over the lazy dog.
-                                She sells seashells by the seashore.
-                                I speak with a natural, relaxed tone, giving clear vowels and consonants.
-                                This example recording should help build an accurate voice model."</p>
-                            <p class="text-sm text-slate-500 mt-4 font-medium">(Please talk for about 15 seconds)</p>
-                         </div>
-                        
-                        <button id="clone-record-btn" class="mic-button bg-rose-600 hover:bg-rose-700 text-white tactile-touch">
-                            <i class="ph-fill ph-microphone text-3xl"></i>
-                            <div class="text-left">
-                                <span class="block font-bold text-2xl">Record Sample</span>
-                                <span class="block text-sm opacity-80 tracking-wider">Tap and hold</span>
-                            </div>
-                        </button>
-
-                        <button id="clone-delete-btn" class="flex items-center gap-2 text-red-500 font-bold hover:bg-red-50 px-6 py-3 rounded-full transition-colors tactile-touch">
-                            <i class="ph-bold ph-trash text-xl"></i>
-                            Delete Voice Model
-                        </button>
-                    </div>
-
-                </section>
+              <div
+                id="conv-voice-bars"
+                class="mt-2 h-10 flex items-center justify-center gap-1.5"
+              >
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+                <div class="voice-bar"></div>
+              </div>
             </div>
-        </div> </main>
+          </section>
 
+          <section class="app-card md:max-h-[80vh] stagger-3">
+            <div class="mb-4 flex items-center justify-between">
+              <div>
+                <h2 class="text-xl font-bold text-slate-800 tracking-tight">
+                  Live Transcript
+                </h2>
+              </div>
+              <i
+                class="ph-bold ph-trash text-slate-400 text-xl cursor-pointer hover:text-red-500 transition-colors p-2 tactile-touch"
+                id="conv-clear-btn"
+              ></i>
+            </div>
+
+            <div class="flex-1 flex flex-col gap-4 overflow-hidden">
+              <div class="transcript-box">
+                <span
+                  class="text-xs font-bold text-slate-500 tracking-wider mb-4 block"
+                  >YOU SAID</span
+                >
+                <div
+                  id="history-source"
+                  class="flex-1 overflow-y-auto no-scrollbar flex flex-col justify-center gap-3"
+                >
+                  <p class="text-slate-400 italic text-center px-8">
+                    Your speech will appear here...
+                  </p>
+                </div>
+              </div>
+              <div class="transcript-box mb-0">
+                <span
+                  id="target-translation-label"
+                  class="text-xs font-bold text-green-600 tracking-wider mb-4 block"
+                  >CORRECT (SPANISH)</span
+                >
+                <div
+                  id="history-target"
+                  class="flex-1 overflow-y-auto no-scrollbar flex flex-col justify-center gap-3"
+                >
+                  <p class="text-green-600/50 italic text-center px-8">
+                    ...and the correction will appear here.
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div id="practice-view" class="view-container hidden-view">
+        <header
+          class="flex items-center justify-between mb-6 max-w 1000px mx-auto relative z-20"
+        >
+          <div class="avatar-container relative">
+            <div class="avatar"><i class="ph-bold ph-user-circle"></i></div>
+          </div>
+          <h2 class="text-xl font-bold text-slate-800 tracking-tight">
+            Practice Mode
+          </h2>
+        </header>
+
+        <div class="main-layout-grid items-center">
+          <section
+            class="app-card card-centered max-w-3xl mx-auto md:max-h-[80vh]"
+          >
+            <div class="mb-6">
+              <div
+                class="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 mx-auto mb-4 shadow-sm border border-indigo-50"
+              >
+                <i class="ph-fill ph-speaker-high text-3xl"></i>
+              </div>
+              <h2 class="text-3xl font-bold text-slate-800 mb-2 tracking-tight">
+                Select a Voice Partner
+              </h2>
+              <p class="text-base text-slate-500 font-medium">
+                Choose who you want to practice with.
+              </p>
+            </div>
+
+            <div
+              id="practice-input-state"
+              class="w-full max-w-lg flex flex-col gap-6 items-center transition-all duration-500"
+            >
+              <div class="w-full mb-4 relative z-20">
+                <div
+                  class="w-full flex items-center justify-between bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-sm transition-all hover:border-indigo-300 hover:shadow-md cursor-pointer relative"
+                >
+                  <span
+                    id="selected-voice-display"
+                    class="font-bold text-indigo-700 flex items-center gap-2"
+                  >
+                    <i class="ph-fill ph-user"></i> Your Own Voice
+                  </span>
+                  <i class="ph-bold ph-caret-down text-indigo-500"></i>
+                  <select
+                    id="practice-voice-select"
+                    class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                  >
+                    <option value="own_voice">Your Own Voice</option>
+                    <option value="trump">Donald Trump</option>
+                    <option value="ronaldo">Cristiano Ronaldo</option>
+                    <option value="spongebob">SpongeBob SquarePants</option>
+                    <option value="biden">Joe Biden</option>
+                  </select>
+                </div>
+              </div>
+
+              <button
+                id="prac-mic-btn"
+                class="mic-button bg-indigo-600 hover:bg-indigo-700 text-white"
+              >
+                <i
+                  id="prac-mic-icon"
+                  class="ph-fill ph-chats-circle text-3xl transition-all"
+                ></i>
+                <div class="text-left">
+                  <span class="block font-bold text-2xl"
+                    >Start Talking with AI</span
+                  >
+                  <span class="block text-sm opacity-80 tracking-wider"
+                    >Tap to begin session</span
+                  >
+                </div>
+              </button>
+            </div>
+
+            <div
+              id="practice-results-state"
+              class="hidden w-full flex flex-col gap-6 transition-all duration-500 animate-in fade-in slide-in-from-bottom-4"
+            >
+              <div class="flex-1 flex flex-col md:flex-row gap-4 items-stretch">
+                <div
+                  class="flex-1 bg-slate-50 rounded-2xl p-5 border border-slate-200 text-left flex flex-col shadow-sm"
+                >
+                  <h3
+                    class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3"
+                  >
+                    1. What we heard
+                  </h3>
+                  <div
+                    class="flex-1 bg-white rounded-xl p-4 flex flex-col items-center justify-center shadow-sm border border-slate-100 gap-3"
+                  >
+                    <p
+                      class="text-lg font-bold text-slate-700 text-center leading-tight"
+                    >
+                      "Buenos dias amigo"
+                    </p>
+                    <button
+                      class="tactile-touch flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-full font-bold transition-colors text-xs"
+                    >
+                      <i class="ph-bold ph-play"></i> Play back
+                    </button>
+                  </div>
+                </div>
+                <div
+                  class="flex-1 bg-amber-50 rounded-2xl p-5 border border-amber-200 text-left flex flex-col shadow-sm"
+                >
+                  <h3
+                    class="text-xs font-bold text-amber-600 uppercase tracking-widest mb-3"
+                  >
+                    2. Analysis
+                  </h3>
+                  <div
+                    class="flex-1 bg-white rounded-xl p-4 flex flex-col items-center justify-center shadow-sm gap-3 border border-amber-100"
+                  >
+                    <div class="flex items-center gap-2">
+                      <span class="text-amber-600 font-bold text-base"
+                        >Score:</span
+                      ><span class="font-black text-3xl text-amber-500"
+                        >85%</span
+                      >
+                    </div>
+                    <p
+                      class="text-sm font-bold text-amber-800 text-center bg-amber-100 px-4 py-2 rounded-xl leading-tight"
+                    >
+                      Don't forget the accent on "días".
+                    </p>
+                  </div>
+                </div>
+                <div
+                  class="flex-1 bg-emerald-50 rounded-2xl p-5 border border-emerald-200 text-left flex flex-col shadow-sm"
+                >
+                  <h3
+                    class="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-3"
+                  >
+                    3. The Correct Way
+                  </h3>
+                  <div
+                    class="flex-1 bg-white rounded-xl p-4 flex flex-col items-center justify-center shadow-sm gap-3 border border-emerald-100"
+                  >
+                    <p
+                      class="text-xl font-black text-emerald-700 text-center leading-tight"
+                    >
+                      "Buenos días, amigo."
+                    </p>
+                    <button
+                      class="tactile-touch flex items-center gap-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-4 py-2 rounded-full font-bold transition-colors text-sm"
+                    >
+                      <i class="ph-bold ph-speaker-high"></i> Listen
+                    </button>
+                  </div>
+                </div>
+              </div>
+              <button
+                id="prac-reset-btn"
+                class="tactile-touch w-full py-3 bg-white border-2 border-indigo-100 text-indigo-600 rounded-full font-bold text-lg hover:bg-indigo-50 transition-all shadow-sm"
+              >
+                Try another practice session
+              </button>
+            </div>
+          </section>
+        </div>
+      </div>
+
+      <div id="clone-view" class="view-container hidden-view">
+        <header
+          class="flex items-center justify-between mb-6 max-w 1000px mx-auto relative z-20"
+        >
+          <div class="avatar-container relative">
+            <div class="avatar"><i class="ph-bold ph-user-circle"></i></div>
+          </div>
+          <h2 class="text-xl font-bold text-slate-800 tracking-tight">
+            Voice Cloning
+          </h2>
+        </header>
+
+        <div class="main-layout-grid items-center">
+          <section
+            class="app-card card-centered max-w-3xl mx-auto md:max-h-[80vh]"
+          >
+            <div class="mb-8">
+              <div
+                class="w-16 h-16 bg-rose-100 rounded-2xl flex items-center justify-center text-rose-600 mx-auto mb-4 shadow-sm border border-rose-50"
+              >
+                <i class="ph-fill ph-wave-sawtooth text-3xl"></i>
+              </div>
+              <h2 class="text-3xl font-bold text-slate-800 mb-2 tracking-tight">
+                Clone Your Voice
+              </h2>
+              <p class="text-base text-slate-500 font-medium">
+                Record samples to create your AI voice model.
+              </p>
+            </div>
+
+            <div class="w-full max-w-lg flex flex-col gap-8 items-center">
+              <div
+                class="bg-slate-50 p-6 rounded-2xl border border-slate-200 w-full shadow-sm text-center"
+              >
+                <p
+                  class="text-sm font-bold text-slate-500 mb-3 uppercase tracking-wider"
+                >
+                  Instructions:
+                </p>
+                <p
+                  class="text-base font-bold text-rose-900 leading-relaxed italic px-4"
+                >
+                  "The quick brown fox jumps over the lazy dog. She sells
+                  seashells by the seashore. I speak with a natural, relaxed
+                  tone, giving clear vowels and consonants. This example
+                  recording should help build an accurate voice model."
+                </p>
+                <p class="text-sm text-slate-500 mt-4 font-medium">
+                  (Please talk for about 15 seconds)
+                </p>
+              </div>
+
+              <button
+                id="clone-record-btn"
+                class="mic-button bg-rose-600 hover:bg-rose-700 text-white tactile-touch"
+              >
+                <i class="ph-fill ph-microphone text-3xl"></i>
+                <div class="text-left">
+                  <span class="block font-bold text-2xl">Record Sample</span>
+                  <span class="block text-sm opacity-80 tracking-wider"
+                    >Tap and hold</span
+                  >
+                </div>
+              </button>
+
+              <button
+                id="clone-delete-btn"
+                class="flex items-center gap-2 text-red-500 font-bold hover:bg-red-50 px-6 py-3 rounded-full transition-colors tactile-touch"
+              >
+                <i class="ph-bold ph-trash text-xl"></i>
+                Delete Voice Model
+              </button>
+            </div>
+          </section>
+        </div>
+      </div>
+    </main>
 
     <div class="bottom-nav-container stagger-4">
-        <div class="bottom-nav">
-            <div id="nav-conv-btn" class="nav-button active">Conversation</div>
-            <div id="nav-prac-btn" class="nav-button inactive">Practice</div>
-            <div id="nav-clone-btn" class="nav-button inactive">Clone Voice</div>
-        </div>
+      <div class="bottom-nav">
+        <div id="nav-conv-btn" class="nav-button active">Conversation</div>
+        <div id="nav-prac-btn" class="nav-button inactive">Practice</div>
+        <div id="nav-clone-btn" class="nav-button inactive">Clone Voice</div>
+      </div>
     </div>
 
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        // ================= CONFETTI LOGIC =================
+        const confettiContainer = document.getElementById("confetti-container");
+        const colors = ["#3B82F6", "#14B8A6", "#10B981", "#60A5FA", "#CBD5E1"];
+        const numConfetti = 60;
 
-<script>
-document.addEventListener('DOMContentLoaded', () => {
+        for (let i = 0; i < numConfetti; i++) {
+          const confetti = document.createElement("div");
+          confetti.classList.add("confetti-piece");
+          confetti.style.left = Math.random() * 100 + "vw";
+          confetti.style.top = Math.random() * 100 + "vh";
+          confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
+          confetti.style.backgroundColor =
+            colors[Math.floor(Math.random() * colors.length)];
+          const size = Math.random() * 6 + 4;
+          confetti.style.width = size + "px";
+          confetti.style.height =
+            (Math.random() > 0.5 ? size : size * 1.5) + "px";
+          confetti.style.opacity = Math.random() * 0.3 + 0.1;
+          confettiContainer.appendChild(confetti);
+        }
 
-    // ================= CONFETTI LOGIC =================
-    const confettiContainer = document.getElementById('confetti-container');
-    const colors = ['#3B82F6', '#14B8A6', '#10B981', '#60A5FA', '#CBD5E1'];
-    const numConfetti = 60; 
+        // ================= NAVIGATION LOGIC =================
+        const navConvBtn = document.getElementById("nav-conv-btn");
+        const navPracBtn = document.getElementById("nav-prac-btn");
+        const navCloneBtn = document.getElementById("nav-clone-btn");
 
-    for (let i = 0; i < numConfetti; i++) {
-        const confetti = document.createElement('div');
-        confetti.classList.add('confetti-piece');
-        confetti.style.left = Math.random() * 100 + 'vw';
-        confetti.style.top = Math.random() * 100 + 'vh';
-        confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-        confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-        const size = Math.random() * 6 + 4; 
-        confetti.style.width = size + 'px';
-        confetti.style.height = (Math.random() > 0.5 ? size : size * 1.5) + 'px';
-        confetti.style.opacity = Math.random() * 0.3 + 0.1; 
-        confettiContainer.appendChild(confetti);
-    }
+        const conversationView = document.getElementById("conversation-view");
+        const practiceView = document.getElementById("practice-view");
+        const cloneView = document.getElementById("clone-view");
 
-    // ================= NAVIGATION LOGIC =================
-    const navConvBtn = document.getElementById('nav-conv-btn');
-    const navPracBtn = document.getElementById('nav-prac-btn');
-    const navCloneBtn = document.getElementById('nav-clone-btn');
-    
-    const conversationView = document.getElementById('conversation-view');
-    const practiceView = document.getElementById('practice-view');
-    const cloneView = document.getElementById('clone-view');
+        function resetViews() {
+          [navConvBtn, navPracBtn, navCloneBtn].forEach((btn) => {
+            btn.classList.remove("active");
+            btn.classList.add("inactive");
+          });
+          [conversationView, practiceView, cloneView].forEach((view) => {
+            view.classList.remove("active-view");
+            view.classList.add("hidden-view");
+          });
+          document.body.classList.remove(
+            "mode-conversation",
+            "mode-practice",
+            "mode-clone"
+          );
+        }
 
-    function resetViews() {
-        [navConvBtn, navPracBtn, navCloneBtn].forEach(btn => {
-            btn.classList.remove('active');
-            btn.classList.add('inactive');
+        navConvBtn.addEventListener("click", () => {
+          resetViews();
+          document.body.classList.add("mode-conversation");
+          navConvBtn.classList.add("active");
+          navConvBtn.classList.remove("inactive");
+          conversationView.classList.add("active-view");
+          conversationView.classList.remove("hidden-view");
         });
-        [conversationView, practiceView, cloneView].forEach(view => {
-            view.classList.remove('active-view');
-            view.classList.add('hidden-view');
+
+        navPracBtn.addEventListener("click", () => {
+          resetViews();
+          document.body.classList.add("mode-practice");
+          navPracBtn.classList.add("active");
+          navPracBtn.classList.remove("inactive");
+          practiceView.classList.add("active-view");
+          practiceView.classList.remove("hidden-view");
         });
-        document.body.classList.remove('mode-conversation', 'mode-practice', 'mode-clone');
-    }
 
-    navConvBtn.addEventListener('click', () => {
-        resetViews();
-        document.body.classList.add('mode-conversation');
-        navConvBtn.classList.add('active'); navConvBtn.classList.remove('inactive');
-        conversationView.classList.add('active-view'); conversationView.classList.remove('hidden-view');
-    });
+        navCloneBtn.addEventListener("click", () => {
+          resetViews();
+          document.body.classList.add("mode-clone");
+          navCloneBtn.classList.add("active");
+          navCloneBtn.classList.remove("inactive");
+          cloneView.classList.add("active-view");
+          cloneView.classList.remove("hidden-view");
+        });
 
-    navPracBtn.addEventListener('click', () => {
-        resetViews();
-        document.body.classList.add('mode-practice');
-        navPracBtn.classList.add('active'); navPracBtn.classList.remove('inactive');
-        practiceView.classList.add('active-view'); practiceView.classList.remove('hidden-view');
-    });
+        // ================= PRACTICE MODE LOGIC =================
+        const practiceVoiceSelect = document.getElementById(
+          "practice-voice-select"
+        );
+        const selectedVoiceDisplay = document.getElementById(
+          "selected-voice-display"
+        );
+        const practiceInputState = document.getElementById(
+          "practice-input-state"
+        );
+        const practiceResultsState = document.getElementById(
+          "practice-results-state"
+        );
+        const pracMicBtn = document.getElementById("prac-mic-btn");
+        const pracResetBtn = document.getElementById("prac-reset-btn");
 
-    navCloneBtn.addEventListener('click', () => {
-        resetViews();
-        document.body.classList.add('mode-clone');
-        navCloneBtn.classList.add('active'); navCloneBtn.classList.remove('inactive');
-        cloneView.classList.add('active-view'); cloneView.classList.remove('hidden-view');
-    });
+        practiceVoiceSelect.addEventListener("change", function () {
+          const selectedText = this.options[this.selectedIndex].text;
+          let iconClass = "ph-user";
+          if (this.value === "trump" || this.value === "biden")
+            iconClass = "ph-user-focus";
+          if (this.value === "ronaldo") iconClass = "ph-soccer-ball";
+          if (this.value === "spongebob") iconClass = "ph-smiley";
+          selectedVoiceDisplay.innerHTML = `<i class="ph-fill ${iconClass}"></i> ${selectedText}`;
+        });
 
-    // ================= PRACTICE MODE LOGIC =================
-    const practiceVoiceSelect = document.getElementById('practice-voice-select');
-    const selectedVoiceDisplay = document.getElementById('selected-voice-display');
-    const practiceInputState = document.getElementById('practice-input-state');
-    const practiceResultsState = document.getElementById('practice-results-state');
-    const pracMicBtn = document.getElementById('prac-mic-btn');
-    const pracResetBtn = document.getElementById('prac-reset-btn');
+        pracMicBtn.addEventListener("click", () => {
+          pracMicBtn.innerHTML =
+            '<i class="ph-bold ph-spinner animate-spin text-3xl"></i><div class="text-left"><span class="block font-bold text-2xl">Connecting...</span><span class="block text-sm opacity-80 tracking-wider">Please wait</span></div>';
+          setTimeout(() => {
+            practiceInputState.classList.add("hidden");
+            practiceResultsState.classList.remove("hidden");
+            pracMicBtn.innerHTML =
+              '<i id="prac-mic-icon" class="ph-fill ph-chats-circle text-3xl transition-all"></i><div class="text-left"><span class="block font-bold text-2xl">Start Talking with AI</span><span class="block text-sm opacity-80 tracking-wider">Tap to begin session</span></div>';
+          }, 1500);
+        });
 
-    // Update dropdown display on change
-    practiceVoiceSelect.addEventListener('change', function() {
-        const selectedText = this.options[this.selectedIndex].text;
-        let iconClass = 'ph-user';
-        if (this.value === 'trump' || this.value === 'biden') iconClass = 'ph-user-focus';
-        if (this.value === 'ronaldo') iconClass = 'ph-soccer-ball';
-        if (this.value === 'spongebob') iconClass = 'ph-smiley';
-        selectedVoiceDisplay.innerHTML = `<i class="ph-fill ${iconClass}"></i> ${selectedText}`;
-    });
+        pracResetBtn.addEventListener("click", () => {
+          practiceResultsState.classList.add("hidden");
+          practiceInputState.classList.remove("hidden");
+        });
 
-    // Simulate Practice Session on Mic Click (still just mock UI)
-    pracMicBtn.addEventListener('click', () => {
-        pracMicBtn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-3xl"></i><div class="text-left"><span class="block font-bold text-2xl">Connecting...</span><span class="block text-sm opacity-80 tracking-wider">Please wait</span></div>';
-        setTimeout(() => {
-            practiceInputState.classList.add('hidden');
-            practiceResultsState.classList.remove('hidden');
-            pracMicBtn.innerHTML = '<i id="prac-mic-icon" class="ph-fill ph-chats-circle text-3xl transition-all"></i><div class="text-left"><span class="block font-bold text-2xl">Start Talking with AI</span><span class="block text-sm opacity-80 tracking-wider">Tap to begin session</span></div>';
-        }, 1500);
-    });
+        // ================= CLONE MODE LOGIC (NEW) =================
+        const cloneRecordBtn = document.getElementById("clone-record-btn");
+        const cloneDeleteBtn = document.getElementById("clone-delete-btn"); // still UI-only for now
 
-    // Reset back to input state
-    pracResetBtn.addEventListener('click', () => {
-        practiceResultsState.classList.add('hidden');
-        practiceInputState.classList.remove('hidden');
-    });
+        let cloneMediaRecorder = null;
+        let cloneAudioChunks = [];
+        let cloneStream = null;
+        let isCloneRecording = false;
+        let isCloneUploading = false;
 
-    // ================= CLONE MODE LOGIC =================
-    // (no backend here yet; just UI — keep as-is if you add later)
+        async function uploadCloneAudio(audioBlob) {
+          try {
+            isCloneUploading = true;
+            // Update button to show upload state
+            cloneRecordBtn.disabled = true;
+            cloneRecordBtn.classList.add("opacity-70", "cursor-not-allowed");
+            cloneRecordBtn.innerHTML = `
+                <i class="ph-bold ph-cloud-arrow-up text-3xl animate-bounce"></i>
+                <div class="text-left">
+                    <span class="block font-bold text-2xl">Uploading sample...</span>
+                    <span class="block text-sm opacity-80 tracking-wider">This may take a moment</span>
+                </div>
+            `;
 
-    // ================= CONVERSATION MODE LOGIC =================
-    const convMicBtn = document.getElementById('conv-mic-btn');
-    const convMicIcon = document.getElementById('conv-mic-icon');
-    const convMicText = document.getElementById('conv-mic-text');
-    const convMicSubtext = document.getElementById('conv-mic-subtext');
-    const convVoiceBars = document.getElementById('conv-voice-bars');
-    const convClearBtn = document.getElementById('conv-clear-btn');
-    const historySource = document.getElementById('history-source');
-    const historyTarget = document.getElementById('history-target');
-    const convLangSelect = document.getElementById('conv-lang-select');
-    const targetTranslationLabel = document.getElementById('target-translation-label');
-    const targetLangFlag = document.getElementById('target-lang-flag');
-    const targetLangNameSpan = document.getElementById('target-lang-name');
+            const formData = new FormData();
+            formData.append("file", audioBlob, "voice_sample.webm");
 
-    // Language UI (still just cosmetic)
-    function updateConvLanguageUI() {
-        const selectedLangCode = convLangSelect.value;
-        let flagUrl = "";
-        let langName = "";
+            // Required by backend: voice_name: str = Form(...)
+            // You can later replace this with a real text input.
+            formData.append("voice_name", "My Voice");
 
-        if (selectedLangCode === 'es') {
+            const response = await fetch(
+              "http://localhost:8000/api/create_clone",
+              {
+                method: "POST",
+                body: formData, // send cookies for get_current_user (if same-origin)
+              }
+            );
+
+            if (!response.ok) {
+              const errText = await response.text().catch(() => "");
+              console.error(
+                "Error from /api/create_clone:",
+                response.status,
+                errText
+              );
+              alert(
+                "Error creating/updating voice clone. Check the console for details."
+              );
+              return;
+            }
+
+            const result = await response.json();
+            console.log("Clone created/updated:", result);
+
+            alert(
+              result.message || "Voice clone created/updated successfully!"
+            );
+            if (result.voice_id) {
+              localStorage.setItem("voice_id", result.voice_id);
+            }
+          } catch (err) {
+            console.error("Upload clone failed:", err);
+            alert("Failed to upload voice sample. Please try again.");
+          } finally {
+            isCloneUploading = false;
+            cloneRecordBtn.disabled = false;
+            cloneRecordBtn.classList.remove("opacity-70", "cursor-not-allowed");
+            // Restore default button content
+            cloneRecordBtn.innerHTML = `
+                <i class="ph-fill ph-microphone text-3xl"></i>
+                <div class="text-left">
+                    <span class="block font-bold text-2xl">Record Sample</span>
+                    <span class="block text-sm opacity-80 tracking-wider">Tap and hold</span>
+                </div>
+            `;
+          }
+        }
+
+        async function handleCloneRecordClick() {
+          if (isCloneUploading) {
+            return; // ignore clicks while upload is in progress
+          }
+
+          // Toggle recording
+          isCloneRecording = !isCloneRecording;
+
+          if (isCloneRecording) {
+            // START recording
+            try {
+              cloneStream = await navigator.mediaDevices.getUserMedia({
+                audio: true,
+              });
+              cloneAudioChunks = [];
+
+              cloneMediaRecorder = new MediaRecorder(cloneStream, {
+                mimeType: "audio/webm",
+              });
+
+              cloneMediaRecorder.ondataavailable = (e) => {
+                if (e.data && e.data.size > 0) {
+                  cloneAudioChunks.push(e.data);
+                }
+              };
+
+              cloneMediaRecorder.start();
+
+              // UI updates for recording state
+              cloneRecordBtn.innerHTML = `
+                    <i class="ph-bold ph-waveform text-3xl animate-pulse"></i>
+                    <div class="text-left">
+                        <span class="block font-bold text-2xl">Recording...</span>
+                        <span class="block text-sm opacity-80 tracking-wider">Speak clearly for ~15 seconds</span>
+                    </div>
+                `;
+            } catch (err) {
+              console.error("Clone MIC ERROR:", err);
+              alert("Microphone blocked for clone. Check browser permissions.");
+              isCloneRecording = false;
+            }
+          } else {
+            // STOP recording
+            if (!cloneMediaRecorder) return;
+
+            cloneMediaRecorder.stop();
+
+            cloneMediaRecorder.onstop = async () => {
+              try {
+                const audioBlob = new Blob(cloneAudioChunks, {
+                  type: "audio/webm",
+                });
+
+                if (cloneStream) {
+                  cloneStream.getTracks().forEach((t) => t.stop());
+                }
+
+                console.log("Clone sample blob:", audioBlob);
+                await uploadCloneAudio(audioBlob);
+              } catch (err) {
+                console.error("Error after stopping clone recorder:", err);
+              } finally {
+                cloneMediaRecorder = null;
+                cloneStream = null;
+                cloneAudioChunks = [];
+              }
+            };
+
+            // While we're waiting for onstop/upload, keep simple text
+            cloneRecordBtn.innerHTML = `
+                <i class="ph-bold ph-waveform text-3xl"></i>
+                <div class="text-left">
+                    <span class="block font-bold text-2xl">Processing sample...</span>
+                    <span class="block text-sm opacity-80 tracking-wider">Please wait</span>
+                </div>
+            `;
+          }
+        }
+
+        cloneRecordBtn.addEventListener("click", handleCloneRecordClick);
+
+        // (optional) Delete button still just UI placeholder
+        cloneDeleteBtn.addEventListener("click", () => {
+          alert("Delete voice model endpoint not wired yet.");
+        });
+
+        // ================= CONVERSATION MODE LOGIC =================
+        const convMicBtn = document.getElementById("conv-mic-btn");
+        const convMicIcon = document.getElementById("conv-mic-icon");
+        const convMicText = document.getElementById("conv-mic-text");
+        const convMicSubtext = document.getElementById("conv-mic-subtext");
+        const convVoiceBars = document.getElementById("conv-voice-bars");
+        const convClearBtn = document.getElementById("conv-clear-btn");
+        const historySource = document.getElementById("history-source");
+        const historyTarget = document.getElementById("history-target");
+        const convLangSelect = document.getElementById("conv-lang-select");
+        const targetTranslationLabel = document.getElementById(
+          "target-translation-label"
+        );
+        const targetLangFlag = document.getElementById("target-lang-flag");
+        const targetLangNameSpan = document.getElementById("target-lang-name");
+
+        function updateConvLanguageUI() {
+          const selectedLangCode = convLangSelect.value;
+          let flagUrl = "";
+          let langName = "";
+
+          if (selectedLangCode === "es") {
             flagUrl = "https://flagicons.lipis.dev/flags/4x3/es.svg";
             langName = "Spanish";
-        } else if (selectedLangCode === 'fr') {
+          } else if (selectedLangCode === "fr") {
             flagUrl = "https://flagicons.lipis.dev/flags/4x3/fr.svg";
             langName = "French";
+          }
+
+          targetLangFlag.src = flagUrl;
+          targetLangFlag.alt = `${langName} Flag`;
+          targetLangNameSpan.textContent = langName;
+          targetTranslationLabel.textContent = `CORRECT (${langName.toUpperCase()})`;
         }
-        
-        targetLangFlag.src = flagUrl;
-        targetLangFlag.alt = `${langName} Flag`;
-        targetLangNameSpan.textContent = langName;
-        targetTranslationLabel.textContent = `CORRECT (${langName.toUpperCase()})`;
-    }
 
-    convLangSelect.addEventListener('change', updateConvLanguageUI);
+        convLangSelect.addEventListener("change", updateConvLanguageUI);
 
-    // Helpers for base64 audio → playable URL
-    function base64ToBlob(base64) {
-        const cleaned = base64.trim();
-        // If the backend already sends a data URL, just skip
-        if (cleaned.startsWith('data:audio')) {
-            // We'll use this string directly as src
+        function base64ToBlob(base64) {
+          const cleaned = base64.trim();
+          if (cleaned.startsWith("data:audio")) {
             return cleaned;
-        }
-        const binary = atob(cleaned);
-        const len = binary.length;
-        const bytes = new Uint8Array(len);
-        for (let i = 0; i < len; i++) {
+          }
+          const binary = atob(cleaned);
+          const len = binary.length;
+          const bytes = new Uint8Array(len);
+          for (let i = 0; i < len; i++) {
             bytes[i] = binary.charCodeAt(i);
+          }
+          const blob = new Blob([bytes]);
+          return URL.createObjectURL(blob);
         }
-        const blob = new Blob([bytes]); // no explicit type so browser sniffs it
-        return URL.createObjectURL(blob);
-    }
 
-    let currentAudio = null;
+        let currentAudio = null;
 
-    function createPlayButton(onClick, extraClasses = '') {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = `tactile-touch flex items-center gap-2 px-3 py-1.5 rounded-full font-bold text-xs ${extraClasses}`;
-        btn.innerHTML = '<i class="ph-bold ph-play"></i> Play';
-        btn.addEventListener('click', () => {
+        function createPlayButton(onClick, extraClasses = "") {
+          const btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = `tactile-touch flex items-center gap-2 px-3 py-1.5 rounded-full font-bold text-xs ${extraClasses}`;
+          btn.innerHTML = '<i class="ph-bold ph-play"></i> Play';
+          btn.addEventListener("click", () => {
             if (currentAudio) {
-                currentAudio.pause();
-                currentAudio.currentTime = 0;
+              currentAudio.pause();
+              currentAudio.currentTime = 0;
             }
             onClick();
-        });
-        return btn;
-    }
-
-    function updateConversationHistory(response) {
-        if (!response) return;
-
-        const {
-            original_text,
-            original_audio,   // base64 (or data URL) for what user said
-            corrected_text,
-            audio_base64      // base64 (or data URL) for corrected TTS
-        } = response;
-
-        // Clear placeholders / previous text
-        historySource.innerHTML = '';
-        historyTarget.innerHTML = '';
-
-        // ---- "YOU SAID" BOX ----
-        const sourceWrapper = document.createElement('div');
-        sourceWrapper.className = 'flex flex-col items-center gap-2';
-
-        const sourceTextEl = document.createElement('p');
-        sourceTextEl.className = 'text-slate-700 font-bold bg-white p-3 rounded-xl shadow-sm border border-slate-100 text-center';
-        sourceTextEl.textContent = original_text || '(No transcription received)';
-        sourceWrapper.appendChild(sourceTextEl);
-
-        if (original_audio) {
-            const srcUrl = base64ToBlob(original_audio);
-            const playBtn = createPlayButton(() => {
-                currentAudio = new Audio(srcUrl);
-                currentAudio.play();
-            }, 'bg-slate-100 hover:bg-slate-200 text-slate-600');
-            sourceWrapper.appendChild(playBtn);
+          });
+          return btn;
         }
 
-        historySource.appendChild(sourceWrapper);
+        function updateConversationHistory(response) {
+          if (!response) return;
 
-        // ---- "CORRECT (LANG)" BOX ----
-        const targetWrapper = document.createElement('div');
-        targetWrapper.className = 'flex flex-col items-center gap-2';
+          const {
+            success,
+            user_message,
+            reply_text,
+            reply_audio,
+            audio_format,
+          } = response;
+          console.log(
+            success,
+            user_message,
+            reply_text,
+            reply_audio,
+            audio_format,
+            response
+          );
 
-        const targetTextEl = document.createElement('p');
-        targetTextEl.className = 'translation-bubble text-center';
-        targetTextEl.textContent = corrected_text || '(No correction received)';
-        targetWrapper.appendChild(targetTextEl);
+          historySource.innerHTML = "";
+          historyTarget.innerHTML = "";
 
-        if (audio_base64) {
-            const tgtUrl = base64ToBlob(audio_base64);
+          const sourceWrapper = document.createElement("div");
+          sourceWrapper.className = "flex flex-col items-center gap-2";
+
+          const sourceTextEl = document.createElement("p");
+          sourceTextEl.className =
+            "text-slate-700 font-bold bg-white p-3 rounded-xl shadow-sm border border-slate-100 text-center";
+          sourceTextEl.innerHTML =
+            user_message || "(No transcription received)";
+          sourceWrapper.appendChild(sourceTextEl);
+
+          historySource.appendChild(sourceWrapper);
+
+          const targetWrapper = document.createElement("div");
+          targetWrapper.className = "flex flex-col items-center gap-2";
+
+          const targetTextEl = document.createElement("p");
+          targetTextEl.className = "translation-bubble text-center";
+          targetTextEl.textContent = reply_text || "(No reply received)";
+          targetWrapper.appendChild(targetTextEl);
+
+          if (reply_audio) {
+            const tgtUrl = base64ToBlob(reply_audio);
             const listenBtn = createPlayButton(() => {
-                currentAudio = new Audio(tgtUrl);
-                currentAudio.play();
-            }, 'bg-emerald-100 hover:bg-emerald-200 text-emerald-800 mt-1');
-            listenBtn.innerHTML = '<i class="ph-bold ph-speaker-high"></i> Listen';
+              currentAudio = new Audio(tgtUrl);
+              currentAudio.play();
+            }, "bg-emerald-100 hover:bg-emerald-200 text-emerald-800 mt-1");
+            listenBtn.innerHTML =
+              '<i class="ph-bold ph-speaker-high"></i> Listen';
             targetWrapper.appendChild(listenBtn);
+          }
+
+          historyTarget.appendChild(targetWrapper);
         }
 
-        historyTarget.appendChild(targetWrapper);
-    }
+        async function uploadAudioToBackend(audioBlob) {
+          console.log("Uploading blob:", audioBlob);
 
-    // ========== Backend Upload Function ==========
-    async function uploadAudioToBackend(audioBlob) {
-        console.log("Uploading blob:", audioBlob);
-
-        try {
+          try {
             const formData = new FormData();
             formData.append("file", audioBlob, "audio.webm");
+            formData.append("target_lang", "es");
 
-            formData.append("target_lang", "es");  // or whatever lang selector value
+            // Use saved cloned voice if available; otherwise default model
+            const savedVoiceId = localStorage.getItem("voice_id");
+            const modelId = savedVoiceId || "54e3a85ac9594ffa83264b8a494b901b";
+            formData.append("model_id", modelId);
 
-        // required by: model_id: str = Form(...)
-            formData.append("model_id", "54e3a85ac9594ffa83264b8a494b901b");
-
-            // optional: chat_history: str = Form(None)
-            const chatHistory = { User: "hello", Assistant: "try thos" };
+            const chatHistory = { User: "hello", Assistant: "try this" };
             formData.append("chat_history", JSON.stringify(chatHistory));
 
             const response = await fetch("http://localhost:8000/api/reply", {
-                method: "POST",
-                body: formData
-
+              method: "POST",
+              body: formData,
             });
+            console.log(response);
 
             if (!response.ok) {
-                console.error("Server returned non-OK status:", response.status);
-                return;
+              console.error("Server returned non-OK status:", response.status);
+              return;
             }
 
             const result = await response.json();
             console.log("Server responded:", result);
-
-            // ⬇️ Put the real texts & audios into the UI
             updateConversationHistory(result);
-
-        } catch (err) {
+          } catch (err) {
             console.error("Upload failed:", err);
+          }
         }
-    }
 
-    // ========== MIC RECORDING / TOGGLE ==========
-    let convMediaRecorder = null;
-    let convAudioChunks = [];
-    let convStream = null;
-    let isConvMicActive = false;
+        let convMediaRecorder = null;
+        let convAudioChunks = [];
+        let convStream = null;
+        let isConvMicActive = false;
 
-    async function handleConvMicToggle() {
-        console.log("Mic clicked");
-        isConvMicActive = !isConvMicActive;
+        async function handleConvMicToggle() {
+          console.log("Mic clicked");
+          isConvMicActive = !isConvMicActive;
 
-        if (isConvMicActive) {
+          if (isConvMicActive) {
             console.log("Starting recording...");
 
             try {
-                convStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+              convStream = await navigator.mediaDevices.getUserMedia({
+                audio: true,
+              });
 
-                convAudioChunks = [];
-                convMediaRecorder = new MediaRecorder(convStream, {
-                    mimeType: "audio/webm"
-                });
+              convAudioChunks = [];
+              convMediaRecorder = new MediaRecorder(convStream, {
+                mimeType: "audio/webm",
+              });
 
-                convMediaRecorder.ondataavailable = e => convAudioChunks.push(e.data);
+              convMediaRecorder.ondataavailable = (e) =>
+                convAudioChunks.push(e.data);
+              convMediaRecorder.start();
 
-                convMediaRecorder.start();
-
-                // UI updates
-                convMicBtn.classList.add('active-state');
-                convMicIcon.classList.remove('ph-microphone');
-                convMicIcon.classList.add('ph-waveform', 'animate-pulse');
-                convMicText.textContent = "Listening...";
-                convMicSubtext.textContent = "Speak clearly";
-                convVoiceBars.classList.add('animate-voice');
-
+              convMicBtn.classList.add("active-state");
+              convMicIcon.classList.remove("ph-microphone");
+              convMicIcon.classList.add("ph-waveform", "animate-pulse");
+              convMicText.textContent = "Listening...";
+              convMicSubtext.textContent = "Speak clearly";
+              convVoiceBars.classList.add("animate-voice");
             } catch (err) {
-                console.error("MIC ERROR:", err);
-                alert("Microphone blocked. Check browser permissions.");
-                isConvMicActive = false;
+              console.error("MIC ERROR:", err);
+              alert("Microphone blocked. Check browser permissions.");
+              isConvMicActive = false;
             }
-
-        } else {
+          } else {
             console.log("Stopping recording...");
 
-            if (!convMediaRecorder) {
-                return;
-            }
+            if (!convMediaRecorder) return;
 
             convMediaRecorder.stop();
 
             convMediaRecorder.onstop = async () => {
-                console.log("Recorder stopped");
+              console.log("Recorder stopped");
 
-                const audioBlob = new Blob(convAudioChunks, { type: "audio/webm" });
+              const audioBlob = new Blob(convAudioChunks, {
+                type: "audio/webm",
+              });
 
-                // Stop audio stream
-                if (convStream) {
-                    convStream.getTracks().forEach(t => t.stop());
-                }
+              if (convStream) {
+                convStream.getTracks().forEach((t) => t.stop());
+              }
 
-                console.log("Final blob:", audioBlob);
-                await uploadAudioToBackend(audioBlob);
+              console.log("Final blob:", audioBlob);
+              await uploadAudioToBackend(audioBlob);
             };
 
-            // UI back to idle
-            convMicBtn.classList.remove('active-state');
-            convMicIcon.classList.remove('ph-waveform', 'animate-pulse');
-            convMicIcon.classList.add('ph-microphone');
+            convMicBtn.classList.remove("active-state");
+            convMicIcon.classList.remove("ph-waveform", "animate-pulse");
+            convMicIcon.classList.add("ph-microphone");
             convMicText.textContent = "Tap to speak";
             convMicSubtext.textContent = "Tap and talk";
-            convVoiceBars.classList.remove('animate-voice');
+            convVoiceBars.classList.remove("animate-voice");
+          }
         }
-    }
 
-    convMicBtn.addEventListener('click', handleConvMicToggle);
+        convMicBtn.addEventListener("click", handleConvMicToggle);
 
-    convClearBtn.addEventListener('click', () => {
-        historySource.innerHTML = '<p class="text-slate-400 italic text-center px-8">Your speech will appear here...</p>';
-        historyTarget.innerHTML = '<p class="text-green-600/50 italic text-center px-8">...and the correction will appear here.</p>';
-    });
+        convClearBtn.addEventListener("click", () => {
+          historySource.innerHTML =
+            '<p class="text-slate-400 italic text-center px-8">Your speech will appear here...</p>';
+          historyTarget.innerHTML =
+            '<p class="text-green-600/50 italic text-center px-8">...and the correction will appear here.</p>';
+        });
 
-    // Initialize UI on load
-    updateConvLanguageUI();
-    document.body.classList.add('mode-conversation');
-});
-</script>
+        // ===== INIT (REAL) =====
+        updateConvLanguageUI();
+        document.body.classList.add("mode-conversation");
 
-
-</body>
+        // helper to manually test with any real response from console
+        window.testRealReply = (resp) => updateConversationHistory(resp);
+      });
+    </script>
+  </body>
 </html>

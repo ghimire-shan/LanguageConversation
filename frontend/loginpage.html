@@ -46,7 +46,7 @@
         </div>
       </form>
 
-      <button class="bg-white border py-3 w-full rounded-xl mt-6 flex justify-center items-center text-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:bg-gray-50 text-[#002D74] font-medium">
+      <button id="google-login-btn" class="bg-white border py-3 w-full rounded-xl mt-6 flex justify-center items-center text-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1 hover:bg-gray-50 text-[#002D74] font-medium">
         <svg class="mr-3" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48" width="24px">
           <path fill="#FFC107" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24c0,11.045,8.955,20,20,20c11.045,0,20-8.955,20-20C44,22.659,43.862,21.35,43.611,20.083z" />
           <path fill="#FF3D00" d="M6.306,14.691l6.571,4.819C14.655,15.108,18.961,12,24,12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C16.318,4,9.656,8.337,6.306,14.691z" />
@@ -82,26 +82,20 @@
   </div>
 
   <script>
+    // Wait for the page to load
     document.addEventListener('DOMContentLoaded', () => {
-        const confettiContainer = document.getElementById('confetti-container');
-        const colors = ['#FFC107', '#3B82F6', '#10B981', '#fbbf24', '#60a5fa', '#34d399']; 
-        const numConfetti = 120; 
 
-        for (let i = 0; i < numConfetti; i++) {
-            const confetti = document.createElement('div');
-            confetti.classList.add('confetti-piece');
-            confetti.style.left = Math.random() * 100 + 'vw';
-            confetti.style.top = Math.random() * 100 + 'vh';
-            confetti.style.transform = `rotate(${Math.random() * 360}deg)`;
-            confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            const sizeBase = Math.random() * 8 + 4; 
-            confetti.style.width = sizeBase + 'px';
-            confetti.style.height = (Math.random() > 0.5 ? sizeBase : sizeBase * 1.5) + 'px';
-            confetti.style.opacity = Math.random() * 0.5 + 0.5;
-            confettiContainer.appendChild(confetti);
-        }
+        // 1. Find the button by the ID you just gave it
+        const googleButton = document.getElementById('google-login-btn');
+
+        // 2. Add a "listener" that waits for a click
+        googleButton.addEventListener('click', () => {
+            // 3. When clicked, change the browser URL to your backend's login address
+            window.location.href = 'http://localhost:8000/auth/login';
+        });
+
     });
-  </script>
+</script>
 
 </body>
 </html>
