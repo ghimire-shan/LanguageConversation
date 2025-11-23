@@ -1,7 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.responses import Response
 from deepgram import DeepgramClient
-import google.genai as genai
+from google import genai
+from google.genai import types
 import json
 import base64
 import os
@@ -27,6 +28,16 @@ from utils.preset_voices import is_preset_voice, get_all_preset_voices
 # FishAudio reads API key from environment variable FISH_API_KEY
 os.environ['FISH_API_KEY'] = settings.FISH_AUDIO_API_KEY
 fish_audio = FishAudio()
+
+# Google GenAI reads API key from GEMINI_API_KEY environment variable (new SDK)
+if settings.GOOGLE_API_KEY:
+    os.environ['GEMINI_API_KEY'] = settings.GOOGLE_API_KEY
+    print(f"GEMINI_API_KEY set (length: {len(settings.GOOGLE_API_KEY)})")
+else:
+    print("GOOGLE_API_KEY is empty! Check your .env file.")
+
+# Create a single client object (reused across requests)
+client = genai.Client()
 
 router = APIRouter(prefix="/api", tags=['api'])
 
@@ -111,7 +122,6 @@ async def get_correction(text, language):
         If the sentence is not correct, make it correct
     """
     try:
-        model = genai.GenerativeModel('gemini-2.0-flash-exp')
         prompt = f"""You are a supportive language teacher. A student is learning {language} and said:
         "{text}"
 
@@ -128,12 +138,14 @@ async def get_correction(text, language):
 
         Return ONLY valid JSON, no markdown or extra text."""
         
-        response = model.generate_content(
-            prompt,
-            generation_config = genai.GenerationConfig(
-                temperature = 0.7,
-                max_output_tokens = 500,
-                response_mime_time = "application/json"
+        # Use the new SDK format
+        response = client.models.generate_content(
+            model='gemini-2.0-flash',
+            contents=prompt,
+            config=types.GenerateContentConfig(
+                temperature=0.7,
+                max_output_tokens=500,
+                response_mime_type='application/json'
             )
         )
         generated_text = response.text.strip()
@@ -219,7 +231,7 @@ async def generate_speech(request: TTSRequest):
             )
         
         # Check if it's a preset voice (for logging/debugging)
-        is_preset = is_preset_voice(request.model_id)
+        # is_preset = is_preset_voice(request.model_id)
         
         # Generate speech using the voice model (works for both preset and user voices)
         audio = fish_audio.tts.convert(
@@ -228,13 +240,29 @@ async def generate_speech(request: TTSRequest):
             format='wav',
             latency='balanced'
         )
-        
-        # Generate speech
-        audio_chunks = []
-        for chunk in audio:
-            audio_chunks.append(chunk)
-        
-        return b"".join(audio_chunks)
+        # Fish Audio SDK returns bytes directly
+        if isinstance(audio, bytes):
+            return audio
+        elif hasattr(audio, 'read'):
+            # Fallback: file-like object
+            return audio.read()
+        elif hasattr(audio, '__iter__') and not isinstance(audio, (str, bytes)):
+            # Fallback: iterable (generator/iterator) - collect chunks
+            audio_chunks = []
+            for chunk in audio:
+                if isinstance(chunk, bytes):
+                    audio_chunks.append(chunk)
+                elif hasattr(chunk, 'read'):
+                    audio_chunks.append(chunk.read())
+                else:
+                    audio_chunks.append(bytes(chunk))
+            return b"".join(audio_chunks)
+        else:
+            # Unexpected type
+            raise HTTPException(
+                status_code=500,
+                detail=f"Unexpected audio format from Fish Audio: {type(audio)}"
+            )
             
     except HTTPException:
         raise

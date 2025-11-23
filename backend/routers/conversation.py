@@ -1,10 +1,24 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request, UploadFile, File, Form
 import json
 import base64
-import google.genai as genai
+import os
+from google import genai
+from google.genai import types
 from routers.practice import transcribe_audio, generate_speech
 from schemas.tts import TTSRequest
 from schemas.conversation import Message
+from config import settings
+
+# Configure Google GenAI API key
+# The new SDK reads from GEMINI_API_KEY environment variable
+if settings.GOOGLE_API_KEY:
+    os.environ['GEMINI_API_KEY'] = settings.GOOGLE_API_KEY
+    print(f"GEMINI_API_KEY set (length: {len(settings.GOOGLE_API_KEY)})")
+else:
+    print("GOOGLE_API_KEY is empty! Check your .env file.")
+
+# Create a single client object (reused across requests)
+client = genai.Client()
 
 router = APIRouter(prefix="/api", tags=['api'])
 
@@ -21,8 +35,7 @@ async def get_reply(user_message: str, conversation_history: list, language: str
         dict with 'reply' key containing the AI's response
     """
     try:
-        model = genai.GenerativeModel('gemini-2.0-flash-exp')
-        
+        print("2 here?")
         # Build conversation context from recent messages (last 5-10 messages)
         # Limit to last 10 messages to avoid token limits
         recent_messages = conversation_history[-10:] if len(conversation_history) > 10 else conversation_history
@@ -74,12 +87,14 @@ Return ONLY a JSON object with this exact format:
 
 Do not include any markdown, explanations, or extra text. Only return the JSON."""
 
-        response = model.generate_content(
-            prompt,
-            generation_config=genai.GenerationConfig(
+        # Use the new SDK format
+        response = client.models.generate_content(
+            model='gemini-2.0-flash',
+            contents=prompt,
+            config=types.GenerateContentConfig(
                 temperature=0.8,
                 max_output_tokens=200,
-                response_mime_type="application/json"
+                response_mime_type='application/json'
             )
         )
         
@@ -102,9 +117,15 @@ Do not include any markdown, explanations, or extra text. Only return the JSON."
             detail=f"Error parsing reply from model: {str(e)}"
         )
     except Exception as e:
+        # Log the full error for debugging
+        error_msg = str(e)
+        error_type = type(e).__name__
+        print(f"❌ Gemini API Error: {error_type}: {error_msg}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(
             status_code=500,
-            detail=f"Error generating reply: {str(e)}"
+            detail=f"Error generating reply: {error_type}: {error_msg}"
         )
 
 @router.post('/reply')
@@ -124,7 +145,6 @@ async def conversation_reply(
     - chat_history: JSON string of recent conversation history from frontend
     """
     try:
-        print("hello we are here")
         audio_data = await file.read()
 
         if len(audio_data) < 1000:
@@ -137,7 +157,6 @@ async def conversation_reply(
             raise HTTPException(status_code=400, detail="No speech was detected")
         
         user_message = transcription['text']
-        print(user_message)
         
         # Step 2: Parse chat history if provided
         conversation_history = []
@@ -159,12 +178,10 @@ async def conversation_reply(
             conversation_history=conversation_history,
             language=target_lang
         )
-        print(reply)
 
         # Step 4: Convert reply to speech using Fish Audio
         request = TTSRequest(transcript=reply['reply'], model_id=model_id)
         reply_audio = await generate_speech(request=request)
-        print(reply_audio)
 
         # Step 5: Convert audio bytes to base64 for frontend
         audio_base64 = base64.b64encode(reply_audio).decode('utf-8')
