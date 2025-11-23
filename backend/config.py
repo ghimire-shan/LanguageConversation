@@ -31,7 +31,7 @@ class Settings:
 
     # Get keys for the models to run
     DEEPGRAM_ENV_KEY = os.getenv("DEEPGRAM_ENV_KEY", "")
-    GEMINI_APK_KEY = os.getenv("GEMINI_APK_KEY", "")
+    GOOGLE_API_KEY = os.getenv("GOOGLE_API_KEY", "")
     FISH_AUDIO_API_KEY = os.getenv("FISH_AUDIO_API_KEY", "")
 
 settings = Settings()

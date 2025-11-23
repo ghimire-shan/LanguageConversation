@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Request
 from fastapi.responses import Response
 from deepgram import DeepgramClient
-from google import genai
+import google.genai as genai
 import json
 import base64
+import os
 
 from fishaudio import FishAudio
 from schemas.tts import TTSRequest
@@ -21,9 +22,10 @@ from schemas import tts
         Return audio stream to user
 """
 
-deepgram = DeepgramClient(settings.DEEPGRAM_ENV_KEY)
-genai.configure(apk_key = settings.GEMINI_APK_KEY)
-fish_audio = FishAudio(settings.FISH_AUDIO_API_KEY)
+deepgram = DeepgramClient(api_key=settings.DEEPGRAM_ENV_KEY)
+# FishAudio reads API key from environment variable FISH_API_KEY
+os.environ['FISH_API_KEY'] = settings.FISH_AUDIO_API_KEY
+fish_audio = FishAudio()
 
 router = APIRouter(prefix="/api", tags=['api'])
 
