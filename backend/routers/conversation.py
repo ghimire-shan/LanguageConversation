@@ -124,6 +124,7 @@ async def conversation_reply(
     - chat_history: JSON string of recent conversation history from frontend
     """
     try:
+        print("hello we are here")
         audio_data = await file.read()
 
         if len(audio_data) < 1000:
@@ -136,6 +137,7 @@ async def conversation_reply(
             raise HTTPException(status_code=400, detail="No speech was detected")
         
         user_message = transcription['text']
+        print(user_message)
         
         # Step 2: Parse chat history if provided
         conversation_history = []
@@ -157,10 +159,12 @@ async def conversation_reply(
             conversation_history=conversation_history,
             language=target_lang
         )
+        print(reply)
 
         # Step 4: Convert reply to speech using Fish Audio
         request = TTSRequest(transcript=reply['reply'], model_id=model_id)
         reply_audio = await generate_speech(request=request)
+        print(reply_audio)
 
         # Step 5: Convert audio bytes to base64 for frontend
         audio_base64 = base64.b64encode(reply_audio).decode('utf-8')
