@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from database import engine, Base
 from routers import auth, practice, voice_clone, conversation
 
+
 # Create database tables
 Base.metadata.create_all(bind=engine)
 
