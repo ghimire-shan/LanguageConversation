@@ -6,7 +6,6 @@
     <title>Language Converter AI - Final with 15s Transcript</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
-    
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <style>
@@ -56,7 +55,6 @@
         .active-view { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; filter: blur(0px); }
         .hidden-view { opacity: 0; transform: translateY(20px) scale(0.98); filter: blur(4px); }
         
-        /* Simple hide utility for practice states */
         .hidden { display: none; }
 
         /* --- MAIN LAYOUT CONTAINER --- */
@@ -87,7 +85,6 @@
         body.mode-practice .avatar { background: linear-gradient(135deg, #A5B4FC, var(--accent-indigo)); }
         body.mode-clone .avatar { background: linear-gradient(135deg, #FDA4AF, var(--accent-rose)); }
 
-
         /* --- COMPONENT STYLES --- */
         .mic-button {
             background-color: var(--button-dark); color: white; width: 100%; padding: 1rem;
@@ -110,14 +107,32 @@
         @keyframes bounceBar { 0%, 100% { height: 24px; } 50% { height: 40px; } }
 
         .transcript-box {
-            flex: 1; background-color: var(--bg-color); border-radius: var(--radius-md);
+            flex: 1; background-color: var(--bg-color); border-radius: 18px;
             padding: 1.5rem; margin-bottom: 1.5rem; display: flex; flex-direction: column;
             border: 1px solid var(--border-light); transition: border-color 0.3s ease;
         }
         .app-card:hover .transcript-box { border-color: #CBD5E1; }
-        .translation-bubble {
-            background-color: var(--accent-teal); color: white; font-weight: 700;
-            padding: 0.75rem 1rem; border-radius: 1rem; box-shadow: var(--shadow-sm);
+
+        /* --- CHAT BUBBLES (shared) --- */
+        .chat-bubble {
+            max-width: 80%;
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            font-size: 0.95rem;
+            line-height: 1.4;
+            box-shadow: var(--shadow-md);
+        }
+        .chat-bubble.user-bubble {
+            margin-left: auto;
+            background-color: #FFFFFF;
+            color: var(--text-primary);
+            border: 1px solid var(--border-light);
+        }
+        .chat-bubble.ai-bubble {
+            margin-right: auto;
+            background-color: var(--accent-teal);
+            color: #FFFFFF;
+            font-weight: 600;
         }
 
         /* Bottom Nav Specifics */
@@ -151,6 +166,7 @@
 
     <main class="relative h-full w-full overflow-hidden pb-28">
         
+        <!-- PRACTICE VIEW (language conversion) -->
         <div id="conversation-view" class="view-container active-view">
             <header class="flex items-center justify-between mb-6 max-w 1000px mx-auto stagger-1 relative z-20">
                  <div class="avatar-container relative">
@@ -167,6 +183,7 @@
             </header>
 
             <div class="main-layout-grid">
+                <!-- LEFT CARD: Practice Mode Controls -->
                 <section class="app-card card-centered md:max-h-[80vh] stagger-2">
                     <h1 class="text-2xl md:text-3xl font-bold text-slate-800 mb-2 tracking-tight">Practice Mode</h1>
                     <p class="text-base text-slate-500 font-medium mb-8">Tap the mic to start speaking.</p>
@@ -199,6 +216,7 @@
                     </div>
                 </section>
 
+                <!-- RIGHT CARD: Live Transcript as Chat -->
                 <section class="app-card md:max-h-[80vh] stagger-3">
                     <div class="mb-4 flex items-center justify-between">
                         <div>
@@ -207,23 +225,22 @@
                         <i class="ph-bold ph-trash text-slate-400 text-xl cursor-pointer hover:text-red-500 transition-colors p-2 tactile-touch" id="conv-clear-btn"></i>
                     </div>
 
-                    <div class="flex-1 flex flex-col gap-4 overflow-hidden">
-                        <div class="transcript-box">
-                            <span class="text-xs font-bold text-slate-500 tracking-wider mb-4 block">YOU SAID</span>
-                            <div id="history-source" class="flex-1 overflow-y-auto no-scrollbar flex flex-col justify-center gap-3">
-                                <p class="text-slate-400 italic text-center px-8">Your speech will appear here...</p>
-                            </div>
-                        </div>
+                    <div class="flex-1 flex flex-col overflow-hidden">
                         <div class="transcript-box mb-0">
-                            <span id="target-translation-label" class="text-xs font-bold text-green-600 tracking-wider mb-4 block">CORRECT (SPANISH)</span>
-                            <div id="history-target" class="flex-1 overflow-y-auto no-scrollbar flex flex-col justify-center gap-3">
-                                <p class="text-green-600/50 italic text-center px-8">...and the correction will appear here.</p>
+                            <span class="text-xs font-bold text-slate-500 tracking-wider mb-4 block">SESSION</span>
+                            <div id="conv-chat-history" class="flex-1 overflow-y-auto no-scrollbar flex flex-col gap-3">
+                                <p class="text-slate-400 italic text-center px-8">
+                                    Messages here...
+                                </p>
                             </div>
                         </div>
                     </div>
                 </section>
             </div>
-        </div> <div id="practice-view" class="view-container hidden-view">
+        </div>
+
+        <!-- CONVERSATION VIEW (voice partner) -->
+        <div id="practice-view" class="view-container hidden-view">
              <header class="flex items-center justify-between mb-6 max-w 1000px mx-auto relative z-20">
                 <div class="avatar-container relative">
                     <div class="avatar"><i class="ph-bold ph-user-circle"></i></div>
@@ -231,19 +248,19 @@
                 <h2 class="text-xl font-bold text-slate-800 tracking-tight">Conversation Mode</h2>
             </header>
 
-             <div class="main-layout-grid items-center">
-                <section class="app-card card-centered max-w-3xl mx-auto md:max-h-[80vh]">
-                    
+            <div class="main-layout-grid">
+                <!-- LEFT CARD: Voice Partner + Mic -->
+                <section class="app-card card-centered md:max-h-[80vh]">
                     <div class="mb-6">
                         <div class="w-16 h-16 bg-indigo-100 rounded-2xl flex items-center justify-center text-indigo-600 mx-auto mb-4 shadow-sm border border-indigo-50">
                             <i class="ph-fill ph-speaker-high text-3xl"></i>
                         </div>
                         <h2 class="text-3xl font-bold text-slate-800 mb-2 tracking-tight">Select a Voice Partner</h2>
-                        <p class="text-base text-slate-500 font-medium">Choose who you want to practice with.</p>
+                        <p class="text-base text-slate-500 font-medium">Choose who you want to talk with.</p>
                     </div>
 
-                    <div id="practice-input-state" class="w-full max-w-lg flex flex-col gap-6 items-center transition-all duration-500">
-                        <div class="w-full mb-4 relative z-20">
+                    <div class="w-full max-w-lg flex flex-col gap-6 items-center">
+                        <div class="w-full mb-2 relative z-20">
                             <div class="w-full flex items-center justify-between bg-slate-50 p-4 rounded-2xl border border-slate-200 shadow-sm transition-all hover:border-indigo-300 hover:shadow-md cursor-pointer relative">
                                 <span id="selected-voice-display" class="font-bold text-indigo-700 flex items-center gap-2">
                                     <i class="ph-fill ph-user"></i> Your Own Voice
@@ -263,46 +280,42 @@
                             <i id="prac-mic-icon" class="ph-fill ph-chats-circle text-3xl transition-all"></i>
                             <div class="text-left">
                                 <span class="block font-bold text-2xl">Start Talking with AI</span>
-                                <span class="block text-sm opacity-80 tracking-wider">Tap to begin session</span>
+                                <span class="block text-sm opacity-80 tracking-wider">Tap to simulate a turn</span>
                             </div>
                         </button>
+
+                        <p class="text-xs text-slate-400 font-medium text-center max-w-xs">
+                            Frontend demo only. Backend team can plug real responses into the conversation handler later.
+                        </p>
+                    </div>
+                </section>
+
+                <!-- RIGHT CARD: Conversation Transcript -->
+                <section class="app-card md:max-h-[80vh]">
+                    <div class="mb-4 flex items-center justify-between">
+                        <div>
+                            <h2 class="text-xl font-bold text-slate-800 tracking-tight">Conversation Transcript</h2>
+                            <p class="text-xs text-slate-400 font-medium">You (white) · AI (green)</p>
+                        </div>
+                        <i class="ph-bold ph-trash text-slate-400 text-xl cursor-pointer hover:text-red-500 transition-colors p-2 tactile-touch" id="conversation-clear-btn"></i>
                     </div>
 
-                    <div id="practice-results-state" class="hidden w-full flex flex-col gap-6 transition-all duration-500 animate-in fade-in slide-in-from-bottom-4">
-                        <div class="flex-1 flex flex-col md:flex-row gap-4 items-stretch">
-                            <div class="flex-1 bg-slate-50 rounded-2xl p-5 border border-slate-200 text-left flex flex-col shadow-sm">
-                                <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3">1. What we heard</h3>
-                                <div class="flex-1 bg-white rounded-xl p-4 flex flex-col items-center justify-center shadow-sm border border-slate-100 gap-3">
-                                    <p class="text-lg font-bold text-slate-700 text-center leading-tight">"Buenos dias amigo"</p>
-                                    <button class="tactile-touch flex items-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-600 px-3 py-1.5 rounded-full font-bold transition-colors text-xs">
-                                        <i class="ph-bold ph-play"></i> Play back
-                                    </button>
-                                </div>
-                            </div>
-                            <div class="flex-1 bg-amber-50 rounded-2xl p-5 border border-amber-200 text-left flex flex-col shadow-sm">
-                                <h3 class="text-xs font-bold text-amber-600 uppercase tracking-widest mb-3">2. Analysis</h3>
-                                <div class="flex-1 bg-white rounded-xl p-4 flex flex-col items-center justify-center shadow-sm gap-3 border border-amber-100">
-                                    <div class="flex items-center gap-2"><span class="text-amber-600 font-bold text-base">Score:</span><span class="font-black text-3xl text-amber-500">85%</span></div>
-                                    <p class="text-sm font-bold text-amber-800 text-center bg-amber-100 px-4 py-2 rounded-xl leading-tight">Don't forget the accent on "días".</p>
-                                </div>
-                            </div>
-                            <div class="flex-1 bg-emerald-50 rounded-2xl p-5 border border-emerald-200 text-left flex flex-col shadow-sm">
-                                <h3 class="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-3">3. The Correct Way</h3>
-                                <div class="flex-1 bg-white rounded-xl p-4 flex flex-col items-center justify-center shadow-sm gap-3 border border-emerald-100">
-                                    <p class="text-xl font-black text-emerald-700 text-center leading-tight">"Buenos días, amigo."</p>
-                                    <button class="tactile-touch flex items-center gap-2 bg-emerald-100 hover:bg-emerald-200 text-emerald-800 px-4 py-2 rounded-full font-bold transition-colors text-sm">
-                                        <i class="ph-bold ph-speaker-high"></i> Listen
-                                    </button>
-                                </div>
+                    <div class="flex-1 flex flex-col overflow-hidden">
+                        <div class="transcript-box mb-0">
+                            <span class="text-xs font-bold text-slate-500 tracking-wider mb-4 block">SESSION</span>
+                            <div id="conversation-chat-history" class="flex-1 overflow-y-auto no-scrollbar flex flex-col gap-3">
+                                <p class="text-slate-400 italic text-center px-8">
+                                    Messages here...
+                                </p>
                             </div>
                         </div>
-                        <button id="prac-reset-btn" class="tactile-touch w-full py-3 bg-white border-2 border-indigo-100 text-indigo-600 rounded-full font-bold text-lg hover:bg-indigo-50 transition-all shadow-sm">Try another practice session</button>
                     </div>
-
-
                 </section>
             </div>
-        </div> <div id="clone-view" class="view-container hidden-view">
+        </div>
+
+        <!-- CLONE VIEW -->
+        <div id="clone-view" class="view-container hidden-view">
             <header class="flex items-center justify-between mb-6 max-w 1000px mx-auto relative z-20">
                 <div class="avatar-container relative">
                     <div class="avatar"><i class="ph-bold ph-user-circle"></i></div>
@@ -344,8 +357,8 @@
 
                 </section>
             </div>
-        </div> </main>
-
+        </div>
+    </main>
 
     <div class="bottom-nav-container stagger-4">
         <div class="bottom-nav">
@@ -354,7 +367,6 @@
             <div id="nav-clone-btn" class="nav-button inactive">Clone Voice</div>
         </div>
     </div>
-
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -377,7 +389,6 @@
                 confetti.style.opacity = Math.random() * 0.3 + 0.1; 
                 confettiContainer.appendChild(confetti);
             }
-
 
             // ================= NAVIGATION LOGIC =================
             const navConvBtn = document.getElementById('nav-conv-btn');
@@ -421,16 +432,29 @@
                 cloneView.classList.add('active-view'); cloneView.classList.remove('hidden-view');
             });
 
+            // ========== SHARED HELPERS FOR CHAT BUBBLES ==========
+            function createUserBubble(text) {
+                const bubble = document.createElement('div');
+                bubble.className = 'chat-bubble user-bubble';
+                bubble.textContent = text;
+                return bubble;
+            }
 
-            // ================= PRACTICE MODE LOGIC =================
+            function createAiBubble(text) {
+                const bubble = document.createElement('div');
+                bubble.className = 'chat-bubble ai-bubble';
+                bubble.textContent = text;
+                return bubble;
+            }
+
+            // ================= CONVERSATION MODE (voice partner) =================
             const practiceVoiceSelect = document.getElementById('practice-voice-select');
             const selectedVoiceDisplay = document.getElementById('selected-voice-display');
-            const practiceInputState = document.getElementById('practice-input-state');
-            const practiceResultsState = document.getElementById('practice-results-state');
             const pracMicBtn = document.getElementById('prac-mic-btn');
-            const pracResetBtn = document.getElementById('prac-reset-btn');
+            const conversationChatHistory = document.getElementById('conversation-chat-history');
+            const conversationClearBtn = document.getElementById('conversation-clear-btn');
 
-            // Update dropdown display on change
+            // Update dropdown label
             practiceVoiceSelect.addEventListener('change', function() {
                 const selectedText = this.options[this.selectedIndex].text;
                 let iconClass = 'ph-user';
@@ -440,43 +464,85 @@
                 selectedVoiceDisplay.innerHTML = `<i class="ph-fill ${iconClass}"></i> ${selectedText}`;
             });
 
-            // Simulate Practice Session on Mic Click
-            pracMicBtn.addEventListener('click', () => {
-                pracMicBtn.innerHTML = '<i class="ph-bold ph-spinner animate-spin text-3xl"></i><div class="text-left"><span class="block font-bold text-2xl">Connecting...</span><span class="block text-sm opacity-80 tracking-wider">Please wait</span></div>';
+            // Mock API function (backend can replace this)
+            function mockConversationAPI(userText, voice) {
+                switch (voice) {
+                    case 'trump':
+                        return "Let me tell you, that was an amazing sentence. We can make your accent even greater.";
+                    case 'ronaldo':
+                        return "Very good! Keep practicing and you'll get better every single day.";
+                    case 'spongebob':
+                        return "Woohoo! That sounded great, let’s keep talking like best buddies!";
+                    case 'biden':
+                        return "You're doing fine. Let's take it step by step and keep going.";
+                    default:
+                        return "Nice! Let's keep the conversation going and try a slightly longer sentence next time.";
+                }
+            }
+
+            function addConversationTurnDemo() {
+                const placeholder = conversationChatHistory.querySelector('p.text-slate-400');
+                if (placeholder) {
+                    conversationChatHistory.innerHTML = '';
+                }
+
+                const userText = "Hey, can you help me practice?";
+                const voice = practiceVoiceSelect.value;
+
+                const userBubble = createUserBubble(userText);
+                conversationChatHistory.appendChild(userBubble);
+                conversationChatHistory.scrollTop = conversationChatHistory.scrollHeight;
+
                 setTimeout(() => {
-                    practiceInputState.classList.add('hidden');
-                    practiceResultsState.classList.remove('hidden');
-                    pracMicBtn.innerHTML = '<i id="prac-mic-icon" class="ph-fill ph-chats-circle text-3xl transition-all"></i><div class="text-left"><span class="block font-bold text-2xl">Start Talking with AI</span><span class="block text-sm opacity-80 tracking-wider">Tap to begin session</span></div>';
-                }, 1500);
+                    const aiText = mockConversationAPI(userText, voice);
+                    const aiBubble = createAiBubble(aiText);
+                    conversationChatHistory.appendChild(aiBubble);
+                    conversationChatHistory.scrollTop = conversationChatHistory.scrollHeight;
+                }, 700);
+            }
+
+            // This is where backend folks can later plug the real audio/text:
+            // Replace addConversationTurnDemo() internals with actual API call and response.
+            pracMicBtn.addEventListener('click', () => {
+                const originalInnerHTML = pracMicBtn.innerHTML;
+                pracMicBtn.disabled = true;
+                pracMicBtn.innerHTML = `
+                    <i class="ph-bold ph-spinner animate-spin text-3xl"></i>
+                    <div class="text-left">
+                        <span class="block font-bold text-2xl">Listening...</span>
+                        <span class="block text-sm opacity-80 tracking-wider">Simulated demo</span>
+                    </div>
+                `.trim();
+
+                setTimeout(() => {
+                    addConversationTurnDemo();
+                    pracMicBtn.disabled = false;
+                    pracMicBtn.innerHTML = originalInnerHTML;
+                }, 900);
             });
 
-            // Reset back to input state
-            pracResetBtn.addEventListener('click', () => {
-                 practiceResultsState.classList.add('hidden');
-                 practiceInputState.classList.remove('hidden');
+            conversationClearBtn.addEventListener('click', () => {
+                conversationChatHistory.innerHTML = `
+                    <p class="text-slate-400 italic text-center px-8">
+                        Your conversation with the AI will appear here as white and green bubbles...
+                    </p>
+                `;
             });
 
-
-            // ================= CONVERSATION MODE LOGIC =================
+            // ================= PRACTICE MODE (language conversion) =================
             const convMicBtn = document.getElementById('conv-mic-btn');
             const convMicIcon = document.getElementById('conv-mic-icon');
             const convMicText = document.getElementById('conv-mic-text');
             const convMicSubtext = document.getElementById('conv-mic-subtext');
             const convVoiceBars = document.getElementById('conv-voice-bars');
             const convClearBtn = document.getElementById('conv-clear-btn');
-            const historySource = document.getElementById('history-source');
-            const historyTarget = document.getElementById('history-target');
             const convLangSelect = document.getElementById('conv-lang-select');
-            const targetTranslationLabel = document.getElementById('target-translation-label');
-            
             const targetLangFlag = document.getElementById('target-lang-flag');
             const targetLangNameSpan = document.getElementById('target-lang-name');
+            const convChatHistory = document.getElementById('conv-chat-history');
 
-
-            // FUNCTION TO UPDATE UI WHEN LANGUAGE DROPDOWN CHANGES
             function updateConvLanguageUI() {
                 const selectedLangCode = convLangSelect.value;
-                
                 let flagUrl = "";
                 let langName = "";
 
@@ -491,26 +557,26 @@
                 targetLangFlag.src = flagUrl;
                 targetLangFlag.alt = `${langName} Flag`;
                 targetLangNameSpan.textContent = langName;
-
-                targetTranslationLabel.textContent = `TRANSLATION (${langName.toUpperCase()})`;
             }
 
             convLangSelect.addEventListener('change', updateConvLanguageUI);
 
-
-            // MIC TOGGLE LOGIC
             let isConvMicActive = false;
             function handleConvMicToggle() {
                 isConvMicActive = !isConvMicActive;
                 if (isConvMicActive) {
                     convMicBtn.classList.add('active-state');
-                    convMicIcon.classList.remove('ph-microphone'); convMicIcon.classList.add('ph-waveform', 'animate-pulse');
-                    convMicText.textContent = "Listening..."; convMicSubtext.textContent = "Speak clearly";
+                    convMicIcon.classList.remove('ph-microphone'); 
+                    convMicIcon.classList.add('ph-waveform', 'animate-pulse');
+                    convMicText.textContent = "Listening...";
+                    convMicSubtext.textContent = "Speak clearly";
                     convVoiceBars.classList.add('animate-voice');
                 } else {
                     convMicBtn.classList.remove('active-state');
-                    convMicIcon.classList.add('ph-microphone'); convMicIcon.classList.remove('ph-waveform', 'animate-pulse');
-                    convMicText.textContent = "Tap to speak"; convMicSubtext.textContent = "Visual demo only";
+                    convMicIcon.classList.add('ph-microphone'); 
+                    convMicIcon.classList.remove('ph-waveform', 'animate-pulse');
+                    convMicText.textContent = "Tap to speak"; 
+                    convMicSubtext.textContent = "VISUAL DEMO ONLY";
                     convVoiceBars.classList.remove('animate-voice');
                     sendDemoMessage();
                 }
@@ -523,36 +589,33 @@
                     demoResponse = "Bonjour, comment allez-vous ?";
                 }
                 
-                if (historySource.querySelector('.text-slate-400')) {
-                    historySource.innerHTML = '';
-                    historyTarget.innerHTML = '';
+                const placeholder = convChatHistory.querySelector('p.text-slate-400');
+                if (placeholder) {
+                    convChatHistory.innerHTML = '';
                 }
                 
-                const newSource = document.createElement('p');
-                newSource.className = "text-slate-700 font-bold bg-white p-3 rounded-xl shadow-sm border border-slate-100 animate-pulse";
-                newSource.textContent = "Hello, how are you?";
-                historySource.appendChild(newSource);
-                historySource.scrollTop = historySource.scrollHeight;
+                const userBubble = createUserBubble("Hello, how are you?");
+                convChatHistory.appendChild(userBubble);
+                convChatHistory.scrollTop = convChatHistory.scrollHeight;
 
                 setTimeout(() => {
-                    newSource.classList.remove('animate-pulse');
-                    const newTarget = document.createElement('p');
-                    newTarget.className = "translation-bubble animate-bounce";
-                    newTarget.textContent = demoResponse;
-                    historyTarget.appendChild(newTarget);
-                    historyTarget.scrollTop = historyTarget.scrollHeight;
-                    setTimeout(() => newTarget.classList.remove('animate-bounce'), 1000);
+                    const aiBubble = createAiBubble(demoResponse);
+                    convChatHistory.appendChild(aiBubble);
+                    convChatHistory.scrollTop = convChatHistory.scrollHeight;
                 }, 800);
             }
 
             convMicBtn.addEventListener('click', handleConvMicToggle);
             
             convClearBtn.addEventListener('click', () => {
-                historySource.innerHTML = '<p class="text-slate-400 italic text-center px-8">Your speech will appear here...</p>';
-                historyTarget.innerHTML = '<p class="text-green-600/50 italic text-center px-8">...and the translation will appear here.</p>';
+                convChatHistory.innerHTML = `
+                    <p class="text-slate-400 italic text-center px-8">
+                        Your messages (white) and AI responses (green) will appear here...
+                    </p>
+                `;
             });
 
-            // Initialize UI on load
+            // Initialize Practice Mode UI on load
             updateConvLanguageUI();
         });
     </script>
