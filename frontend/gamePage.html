@@ -1135,16 +1135,18 @@
           if (!response) return;
 
           const {
-            original_text,
-            original_audio,
-            corrected_text,
-            audio_base64,
+            success,
+            user_message,
+            reply_text,
+            reply_audio,
+            audio_format,
           } = response;
           console.log(
-            original_text,
-            original_audio,
-            corrected_text,
-            audio_base64,
+            success,
+            user_message,
+            reply_text,
+            reply_audio,
+            audio_format,
             response
           );
 
@@ -1158,17 +1160,8 @@
           sourceTextEl.className =
             "text-slate-700 font-bold bg-white p-3 rounded-xl shadow-sm border border-slate-100 text-center";
           sourceTextEl.innerHTML =
-            original_text || "(No transcription received)";
+            user_message || "(No transcription received)";
           sourceWrapper.appendChild(sourceTextEl);
-
-          if (original_audio) {
-            const srcUrl = base64ToBlob(original_audio);
-            const playBtn = createPlayButton(() => {
-              currentAudio = new Audio(srcUrl);
-              currentAudio.play();
-            }, "bg-slate-100 hover:bg-slate-200 text-slate-600");
-            sourceWrapper.appendChild(playBtn);
-          }
 
           historySource.appendChild(sourceWrapper);
 
@@ -1177,12 +1170,11 @@
 
           const targetTextEl = document.createElement("p");
           targetTextEl.className = "translation-bubble text-center";
-          targetTextEl.textContent =
-            corrected_text || "(No correction received)";
+          targetTextEl.textContent = reply_text || "(No reply received)";
           targetWrapper.appendChild(targetTextEl);
 
-          if (audio_base64) {
-            const tgtUrl = base64ToBlob(audio_base64);
+          if (reply_audio) {
+            const tgtUrl = base64ToBlob(reply_audio);
             const listenBtn = createPlayButton(() => {
               currentAudio = new Audio(tgtUrl);
               currentAudio.play();
@@ -1317,4 +1309,3 @@
     </script>
   </body>
 </html>
-
