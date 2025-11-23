@@ -52,6 +52,7 @@ async def get_reply(user_message: str, conversation_history: list, language: str
         
         # Add current user message
         conversation_context += f"User: {user_message}\n"
+        print(conversation_context)
         
         # Language name mapping
         lang_names = {

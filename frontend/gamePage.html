@@ -463,7 +463,7 @@
     <option value="es">Spanish</option>
     <option value="fr">French</option>
     <option value="de">German</option>
-    <option value="jp">Japanese</option>
+    <option value="ja">Japanese</option>
   </select>
   <div
     class="flex items-center gap-2 text-blue-600 pointer-events-none z-10"
@@ -586,7 +586,7 @@
             <option value="es">Spanish</option>
             <option value="fr">French</option>
             <option value="de">German</option>
-            <option value="jp">Japanese</option>
+            <option value="ja">Japanese</option>
           </select>
           <div
             class="flex items-center gap-2 text-blue-600 pointer-events-none z-10"
@@ -623,7 +623,13 @@
                 Adam
               </option>
               <option value="e0e2468ce2d746c1b20a4414435f6f48">
-                Bro
+                Brother
+              </option>
+              <option value="54e3a85ac9594ffa83264b8a494b901b">
+                Spongebob
+              </option>
+              <option value="86304d8fa1734bd89291acf4060d8a5e">
+                Cristiano Ronaldo
               </option>
             </select>
             <i class="ph-bold ph-caret-down text-slate-400 ml-2"></i>
@@ -988,7 +994,7 @@ our world is, full of interesting discoveries waiting to be made."
           } else if (selectedLangCode === "de") {
             flagUrl = "https://flagicons.lipis.dev/flags/4x3/de.svg";
             langName = "Germany";
-          } else if (selectedLangCode === "jp") {
+          } else if (selectedLangCode === "ja") {
             flagUrl = "https://flagicons.lipis.dev/flags/4x3/jp.svg";
             langName = "Japan";
           }
@@ -1447,7 +1453,7 @@ our world is, full of interesting discoveries waiting to be made."
           } else if (selectedLangCode === "de") {
             flagUrl = "https://flagicons.lipis.dev/flags/4x3/de.svg";
             langName = "Germany";
-          } else if (selectedLangCode === "jp") {
+          } else if (selectedLangCode === "ja") {
             flagUrl = "https://flagicons.lipis.dev/flags/4x3/jp.svg";
             langName = "Japan";
           }
@@ -1608,13 +1614,11 @@ our world is, full of interesting discoveries waiting to be made."
             // Get target language and model ID
 const targetLang = conversationLangSelect.value;
 
-let modelId = localStorage.getItem("user_voice_model_id");
-if (!modelId && conversationModelSelect) {
-  modelId = conversationModelSelect.value;
-}
-if (!modelId) {
-  modelId = "03397b4c4be74759b72533b663fbd001";
-}
+    let modelId = conversationModelSelect.value;
+
+    if (!modelId) {
+    modelId = "03397b4c4be74759b72533b663fbd001";
+    }
 
 formData.append("target_lang", targetLang);
 formData.append("model_id", modelId);
