@@ -1,7 +1,7 @@
 import os
 from pathlib import Path
 from typing import Optional
-from deepgram import DeepgramClient, PrerecordedOptions, FileSource
+import deepgram
 import google.genai as genai
 
 # Try to load .env file if python-dotenv is available
