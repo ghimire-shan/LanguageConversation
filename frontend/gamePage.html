@@ -492,7 +492,7 @@
                 targetLangFlag.alt = `${langName} Flag`;
                 targetLangNameSpan.textContent = langName;
 
-                targetTranslationLabel.textContent = `TRANSLATION (${langName.toUpperCase()})`;
+                targetTranslationLabel.textContent = `CORRECT (${langName.toUpperCase()})`;
             }
 
             convLangSelect.addEventListener('change', updateConvLanguageUI);
@@ -556,5 +556,7 @@
             updateConvLanguageUI();
         });
     </script>
+    <script src="script.js"></script>
+
 </body>
 </html>
