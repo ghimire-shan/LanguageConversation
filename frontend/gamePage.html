@@ -344,6 +344,18 @@
       .nav-button.inactive:hover {
         background-color: rgba(0, 0, 0, 0.03);
       }
+      .typing-cursor {
+  width: 2px;
+  height: 18px;
+  background-color: var(--accent-teal);
+  margin: 0.5rem auto 0;
+  animation: blinkCursor 1s steps(2, start) infinite;
+}
+
+@keyframes blinkCursor {
+  0%, 50% { opacity: 1; }
+  50.01%, 100% { opacity: 0; }
+}
 
       /* Utilities */
       .tactile-touch {
@@ -364,19 +376,6 @@
   </head>
   <body class="h-full overflow-hidden bg-[#F8FAFC] mode-practice">
     <div id="confetti-container"></div>
-
-    <div
-      class="fixed bottom-4 right-4 z-50 flex items-center gap-2 bg-white/80 backdrop-blur-md p-2 pr-4 rounded-full shadow-sm border border-slate-100 transition-all hover:shadow-md cursor-default animate-in fade-in slide-in-from-bottom-4 duration-700"
-    >
-      <img
-        src="https://placehold.co/40x40/3B82F6/ffffff?text=MH"
-        alt="Mad Hacks Logo"
-        class="w-8 h-8 rounded-full"
-      />
-      <span class="font-bold text-slate-700 text-sm"
-        >Language Converter AI</span
-      >
-    </div>
 
     <main class="relative h-full w-full overflow-hidden pb-28">
       <!-- PRACTICE VIEW (language conversion) -->
@@ -537,187 +536,164 @@
       </div>
 
       <!-- CONVERSATION VIEW (back and forth conversation) -->
-      <div id="conversation-view" class="view-container hidden-view">
-        <header
-          class="flex items-center justify-between mb-6 max-w 1000px mx-auto stagger-1 relative z-20"
+<div id="conversation-view" class="view-container hidden-view">
+  <header
+    class="flex items-center justify-between mb-6 max-w 1000px mx-auto stagger-1 relative z-20"
+  >
+    <div class="avatar-container relative">
+      <div class="avatar"><i class="ph-bold ph-user-circle"></i></div>
+      <div
+        class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-[2px] border-white animate-pulse"
+      ></div>
+    </div>
+  </header>
+
+  <div class="main-layout-grid">
+    <!-- LEFT CARD: Conversation Mode Controls -->
+    <section class="app-card card-centered md:max-h-[80vh] stagger-2">
+      <h1
+        class="text-2xl md:text-3xl font-bold text-slate-800 mb-2 tracking-tight"
+      >
+        Conversation Mode
+      </h1>
+      <p class="text-base text-slate-500 font-medium mb-8">
+        Have a conversation with AI in your target language.
+      </p>
+
+      <div
+        class="w-full max-w-xs flex flex-col gap-4 items-center relative z-10 mb-2"
+      >
+        <!-- LANGUAGE SELECTOR -->
+        <div
+          class="w-full flex items-center justify-center bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm transition-colors hover:border-blue-200 relative"
         >
-          <div class="avatar-container relative">
-            <div class="avatar"><i class="ph-bold ph-user-circle"></i></div>
-            <div
-              class="absolute bottom-0 right-0 w-3 h-3 bg-green-400 rounded-full border-[2px] border-white animate-pulse"
-            ></div>
-          </div>
-          <div
-            class="flex items-center gap-3 bg-white/80 backdrop-blur-sm p-2 rounded-2xl shadow-sm border border-blue-100/50"
+          <select
+            id="conversation-lang-select"
+            class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
           >
-            <div
-              class="flex items-center gap-1 text-orange-500 font-bold text-sm px-2"
+            <option value="en">English</option>
+            <option value="es">Spanish</option>
+            <option value="fr">French</option>
+            <option value="de">German</option>
+            <option value="jp">Japanese</option>
+          </select>
+          <div
+            class="flex items-center gap-2 text-blue-600 pointer-events-none z-10"
+          >
+            <span class="text-slate-500 font-medium text-sm mr-1"
+              >Talk in:</span
             >
-              <i class="ph-fill ph-fire text-lg"></i> 3 Day Streak
-            </div>
-            <div class="w-8 h-8 relative flex items-center justify-center">
-              <svg class="w-full h-full rotate-[-90deg]" viewBox="0 0 36 36">
-                <path
-                  class="text-slate-200"
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="3"
-                />
-                <path
-                  class="text-blue-500"
-                  stroke-dasharray="75, 100"
-                  d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="3"
-                  stroke-linecap="round"
-                />
-              </svg>
-              <span class="absolute text-[10px] font-bold text-blue-600"
-                >75%</span
-              >
-            </div>
+            <img
+              id="conversation-lang-flag"
+              src="https://flagicons.lipis.dev/flags/4x3/es.svg"
+              alt="Target Flag"
+              class="w-5 h-4 object-cover rounded-sm shadow-sm"
+            />
+            <span id="conversation-lang-name" class="font-bold text-sm"
+              >Spanish</span
+            >
+            <i class="ph-bold ph-caret-down"></i>
           </div>
-        </header>
+        </div>
 
-        <div class="main-layout-grid">
-          <!-- LEFT CARD: Conversation Mode Controls -->
-          <section class="app-card card-centered md:max-h-[80vh] stagger-2">
-            <h1
-              class="text-2xl md:text-3xl font-bold text-slate-800 mb-2 tracking-tight"
+        <!-- MODEL DROPDOWN (same style as practice) -->
+        <div
+          class="w-full bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm transition-colors hover:border-blue-200"
+        >
+          <div class="flex items-center justify-between">
+            <select
+              id="conversation-model-select"
+              class="bg-transparent text-sm font-bold text-slate-700 outline-none flex-1 cursor-pointer"
             >
-              Conversation Mode
-            </h1>
-            <p class="text-base text-slate-500 font-medium mb-8">
-              Have a conversation with AI in your target language.
-            </p>
+              <option value="03397b4c4be74759b72533b663fbd001">
+                Energetic Male
+              </option>
+              <option value="728f6ff2240d49308e8137ffe66008e2">
+                Adam
+              </option>
+              <option value="e0e2468ce2d746c1b20a4414435f6f48">
+                Bro
+              </option>
+            </select>
+            <i class="ph-bold ph-caret-down text-slate-400 ml-2"></i>
+          </div>
+        </div>
 
-            <div
-  class="w-full max-w-xs flex flex-col gap-4 items-center relative z-10 mb-2"
->
-  <!-- LANGUAGE SELECTOR -->
-  <div
-    class="w-full flex items-center justify-center bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm transition-colors hover:border-blue-200 relative"
-  >
-    <select
-      id="conversation-lang-select"
-      class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-    >
-      <option value="en">English</option>
-      <option value="es">Spanish</option>
-      <option value="fr">French</option>
-      <option value="de">German</option>
-      <option value="jp">Japanese</option>
-    </select>
-    <div
-      class="flex items-center gap-2 text-blue-600 pointer-events-none z-10"
-    >
-      <span class="text-slate-500 font-medium text-sm mr-1">Talk in:</span>
-      <img
-        id="conversation-lang-flag"
-        src="https://flagicons.lipis.dev/flags/4x3/es.svg"
-        alt="Target Flag"
-        class="w-5 h-4 object-cover rounded-sm shadow-sm"
-      />
-      <span id="conversation-lang-name" class="font-bold text-sm"
-        >Spanish</span
-      >
-      <i class="ph-bold ph-caret-down"></i>
-    </div>
-  </div>
+        <!-- MIC BUTTON -->
+        <button id="conversation-mic-btn" class="mic-button group">
+          <i
+            id="conversation-mic-icon"
+            class="ph-fill ph-microphone text-2xl transition-all"
+          ></i>
+          <div class="text-left">
+            <span
+              id="conversation-mic-text"
+              class="block font-bold text-lg"
+              >Tap to speak</span
+            >
+            <span
+              id="conversation-mic-subtext"
+              class="block text-xs opacity-70"
+              >Ready</span
+            >
+          </div>
+        </button>
 
-  <!-- MODEL SELECT (MOVED FROM PRACTICE MODE) -->
-  <div
-    class="w-full bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm transition-colors hover:border-blue-200"
-  >
-    <div class="flex items-center justify-between">
-      <select
-        id="conversation-model-select"
-        class="bg-transparent text-sm font-bold text-slate-700 outline-none flex-1 cursor-pointer"
-      >
-        <option value="03397b4c4be74759b72533b663fbd001">
-          Energetic Male
-        </option>
-        <option value="728f6ff2240d49308e8137ffe66008e2">
-          Adam
-        </option>
-        <option value="e0e2468ce2d746c1b20a4414435f6f48">
-          Bro
-        </option>
-      </select>
-      <i class="ph-bold ph-caret-down text-slate-400 ml-2"></i>
-    </div>
-  </div>
-
-  <!-- MIC BUTTON -->
-  <button id="conversation-mic-btn" class="mic-button group">
-    <i
-      id="conversation-mic-icon"
-      class="ph-fill ph-microphone text-2xl transition-all"
-    ></i>
-    <div class="text-left">
-      <span id="conversation-mic-text" class="block font-bold text-lg"
-        >Tap to speak</span
-      >
-      <span
-        id="conversation-mic-subtext"
-        class="block text-xs opacity-70"
-        >Ready</span
-      >
-    </div>
-  </button>
-
-  <!-- VOICE BARS -->
-  <div
-    id="conversation-voice-bars"
-    class="mt-2 h-10 flex items-center justify-center gap-1.5"
-  >
-    <div class="voice-bar"></div>
-    <div class="voice-bar"></div>
-    <div class="voice-bar"></div>
-    <div class="voice-bar"></div>
-    <div class="voice-bar"></div>
-  </div>
-</div>
-
-          <!-- RIGHT CARD: Conversation Chat -->
-          <section class="app-card md:max-h-[80vh]">
-            <div class="mb-4 flex items-center justify-between">
-              <div>
-                <h2 class="text-xl font-bold text-slate-800 tracking-tight">
-                  Conversation
-                </h2>
-                <p class="text-xs text-slate-400 font-medium">
-                  You (white) · AI (green)
-                </p>
-              </div>
-              <i
-                class="ph-bold ph-trash text-slate-400 text-xl cursor-pointer hover:text-red-500 transition-colors p-2 tactile-touch"
-                id="conversation-chat-clear-btn"
-              ></i>
-            </div>
-
-            <div class="flex-1 flex flex-col overflow-hidden min-h-0">
-              <div class="transcript-box mb-0 min-h-0">
-                <span
-                  class="text-xs font-bold text-slate-500 tracking-wider mb-4 block"
-                >
-                  CHAT
-                </span>
-                <div
-                  id="conversation-chat-container"
-                  class="flex-1 overflow-y-auto flex flex-col gap-3 h-full"
-                >
-                  <p class="text-slate-400 italic text-center px-8">
-                    Your conversation will appear here...
-                  </p>
-                </div>
-              </div>
-            </div>
-          </section>
+        <!-- VOICE BARS -->
+        <div
+          id="conversation-voice-bars"
+          class="mt-2 h-10 flex items-center justify-center gap-1.5"
+        >
+          <div class="voice-bar"></div>
+          <div class="voice-bar"></div>
+          <div class="voice-bar"></div>
+          <div class="voice-bar"></div>
+          <div class="voice-bar"></div>
         </div>
       </div>
+    </section>
+
+    <!-- RIGHT CARD: Conversation Chat -->
+    <section class="app-card md:max-h-[80vh]">
+      <div class="mb-4 flex items-center justify-between">
+        <div>
+          <h2 class="text-xl font-bold text-slate-800 tracking-tight">
+            Conversation
+          </h2>
+          <p class="text-xs text-slate-400 font-medium">
+            You (white) · AI (green)
+          </p>
+        </div>
+        <i
+          class="ph-bold ph-trash text-slate-400 text-xl cursor-pointer hover:text-red-500 transition-colors p-2 tactile-touch"
+          id="conversation-chat-clear-btn"
+        ></i>
+      </div>
+
+      <div class="flex-1 flex flex-col overflow-hidden min-h-0">
+        <div class="transcript-box mb-0 min-h-0">
+          <span
+            class="text-xs font-bold text-slate-500 tracking-wider mb-4 block"
+          >
+            CHAT
+          </span>
+          <div
+  id="conversation-chat-container"
+  class="flex-1 overflow-y-auto flex flex-col gap-3 h-full"
+>
+  <p class="text-slate-400 italic text-center px-8">
+    Your conversation will appear here...
+  </p>
+
+  <!-- Typing cursor placeholder (backend can toggle .hidden) -->
+  <div id="conversation-typing-cursor" class="typing-cursor hidden"></div>
+</div>
+
+        </div>
+      </div>
+    </section>
+  </div>
+</div>
 
       <!-- CLONE VIEW -->
       <div id="clone-view" class="view-container hidden-view">
@@ -732,70 +708,72 @@
           </h2>
         </header>
 
-        <div class="main-layout-grid items-center">
+        <div class="main-layout-grid items-start justify-center pt-4 pb-6">
           <section
-            class="app-card card-centered max-w-3xl mx-auto md:max-h-[80vh]"
-          >
-            <div class="mb-8">
-              <div
-                class="w-16 h-16 bg-rose-100 rounded-2xl flex items-center justify-center text-rose-600 mx-auto mb-4 shadow-sm border border-rose-50"
-              >
-                <i class="ph-fill ph-wave-sawtooth text-3xl"></i>
-              </div>
-              <h2 class="text-3xl font-bold text-slate-800 mb-2 tracking-tight">
-                Clone Your Voice
-              </h2>
-              <p class="text-base text-slate-500 font-medium">
-                Record samples to create your AI voice model.
-              </p>
-            </div>
+  class="app-card max-w-2xl mx-auto md:max-h-[80vh] min-h-[60vh] flex flex-col"
+>
+  <!-- TOP: ICON + TITLE -->
+  <div class="flex items-center gap-3 mb-4">
+    <div
+      class="w-10 h-10 bg-rose-100 rounded-2xl flex items-center justify-center text-rose-600 shadow-sm border border-rose-50"
+    >
+      <i class="ph-fill ph-wave-sawtooth text-xl"></i>
+    </div>
+    <div>
+      <h2 class="text-2xl font-semibold text-slate-800 tracking-tight">
+        Clone Your Voice
+      </h2>
+      <p class="text-sm text-slate-500">
+        Record a short sample to build your voice model.
+      </p>
+    </div>
+  </div>
 
-            <div class="w-full max-w-lg flex flex-col gap-8 items-center">
-              <div
-                class="bg-slate-50 p-6 rounded-2xl border border-slate-200 w-full shadow-sm text-center"
-              >
-                <p
-                  class="text-sm font-bold text-slate-500 mb-3 uppercase tracking-wider"
-                >
-                  Instructions:
-                </p>
-                <p
-                  class="text-base font-bold text-rose-900 leading-relaxed italic px-4"
-                >
-                  "Hello, my name is Alex, and I enjoy reading books about
-                  technology and science. Yesterday, I walked through the park,
-                  observing the beautiful autumn leaves. The weather was quite
-                  pleasant, with a gentle breeze and warm sunshine. I often
-                  think about how amazing our world is, full of interesting
-                  discoveries waiting to be made."
-                </p>
-                <p class="text-sm text-slate-500 mt-4 font-medium">
-                  (Please talk for about 15 seconds)
-                </p>
-              </div>
+  <!-- MIDDLE: SCRIPT BOX -->
+  <div
+    class="bg-slate-50 p-4 rounded-2xl border border-slate-200 w-full shadow-sm text-center mb-4"
+  >
+    <p
+      class="text-[11px] font-semibold text-slate-500 mb-2 uppercase tracking-wider"
+    >
+      Sample script
+    </p>
+    <p class="text-sm text-rose-900 leading-relaxed px-2">
+      “Hello, my name is Alex. I enjoy reading books about technology and
+      science. Yesterday I walked through the park, watching the autumn leaves
+      and warm sunshine.”
+    </p>
+    <p class="text-[11px] text-slate-500 mt-2">
+      Aim for about 10–15 seconds of clear audio.
+    </p>
+  </div>
 
-              <button
-                id="clone-record-btn"
-                class="mic-button bg-rose-600 hover:bg-rose-700 text-white tactile-touch"
-              >
-                <i class="ph-fill ph-microphone text-3xl"></i>
-                <div class="text-left">
-                  <span class="block font-bold text-2xl">Record Sample</span>
-                  <span class="block text-sm opacity-80 tracking-wider"
-                    >Tap and hold</span
-                  >
-                </div>
-              </button>
+  <!-- BOTTOM: BUTTONS -->
+  <div class="mt-auto flex flex-col gap-3 items-center">
+    <button
+      id="clone-record-btn"
+      class="mic-button bg-rose-600 hover:bg-rose-700 text-white tactile-touch"
+    >
+      <i class="ph-fill ph-microphone text-2xl"></i>
+      <div class="text-left">
+        <span class="block font-bold text-lg">Record Sample</span>
+        <span class="block text-[11px] opacity-80 tracking-wide">
+          Tap and hold to record
+        </span>
+      </div>
+    </button>
 
-              <button
-                id="clone-delete-btn"
-                class="flex items-center gap-2 text-red-500 font-bold hover:bg-red-50 px-6 py-3 rounded-full transition-colors tactile-touch"
-              >
-                <i class="ph-bold ph-trash text-xl"></i>
-                Delete Voice Model
-              </button>
-            </div>
-          </section>
+    <button
+      id="clone-delete-btn"
+      class="flex items-center gap-2 text-red-500 font-semibold hover:bg-red-50 px-4 py-2 rounded-full transition-colors tactile-touch text-xs"
+    >
+      <i class="ph-bold ph-trash text-lg"></i>
+      Delete Voice Model
+    </button>
+  </div>
+</section>
+
+
         </div>
       </div>
     </main>
