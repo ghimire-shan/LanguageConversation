@@ -7,6 +7,7 @@ def main():
     # Load environment variables from .env (for FISH_API_KEY)
     load_dotenv()
 
+    voice_id = os.getenv("VOICE_ID")
     api_key = os.getenv("FISH_API_KEY")
     if not api_key:
         print("❌ ERROR: Missing FISH_API_KEY in .env file")
@@ -16,7 +17,7 @@ def main():
     client = FishAudio(api_key=api_key)
 
     # TODO: put your saved voice ID here
-    VOICE_ID = "629e083e56904688895b9962283e381b"
+    ###VOICE_ID = "629e083e56904688895b9962283e381b"
 
     print("\n🔊 Step 2: Generating TTS with your cloned voice...")
 
