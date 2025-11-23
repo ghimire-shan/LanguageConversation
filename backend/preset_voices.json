@@ -5,14 +5,29 @@
       "name": "Energetic Male",
       "description": "A lively and energetic male voice"
     },
+    "spongebob": {
+      "id": "54e3a85ac9594ffa83264b8a494b901b",
+      "name": "Spongebob",
+      "description": "Who lives in a pineapple under the sea?"
+    },
     "adam": {
       "id": "728f6ff2240d49308e8137ffe66008e2",
       "name": "Adam",
       "description": "Adam voice preset"
     },
+    "ronaldo": {
+      "id": "86304d8fa1734bd89291acf4060d8a5e",
+      "name": "Cristiano Ronaldo",
+      "description": "cr7"
+    },
+    "kane": {
+      "id": "b51571d2c0324759a3014a5443a4dbd6",
+      "name": "Harry Kane",
+      "description": "king of london"
+    },
     "bro": {
       "id": "e0e2468ce2d746c1b20a4414435f6f48",
-      "name": "Bro",
+      "name": "Brother",
       "description": "Bro voice preset"
     }
   }
