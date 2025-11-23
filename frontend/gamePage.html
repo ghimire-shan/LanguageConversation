@@ -447,8 +447,12 @@
                   id="practice-lang-select"
                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
                 >
+                    <option value="en">English</option>
                   <option value="es">Spanish</option>
                   <option value="fr">French</option>
+                  <option value="de">German</option>
+                  <option value="jp">Japanese</option>
+
                 </select>
                 <div
                   class="flex items-center gap-2 text-blue-600 pointer-events-none z-10"
@@ -473,12 +477,6 @@
               <div
                 class="w-full bg-slate-50 p-3 rounded-2xl border border-slate-200 shadow-sm transition-colors hover:border-blue-200"
               >
-                <label
-                  for="practice-model-select"
-                  class="block text-slate-500 font-medium text-xs mb-1"
-                >
-                  Model
-                </label>
                 <div class="flex items-center justify-between">
                   <select
                     id="practice-model-select"
@@ -635,8 +633,11 @@
                   id="conversation-lang-select"
                   class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
                 >
-                  <option value="es">Spanish</option>
-                  <option value="fr">French</option>
+                <option value="en">English</option>
+                <option value="es">Spanish</option>
+                <option value="fr">French</option>
+                <option value="de">German</option>
+                <option value="jp">Japanese</option>
                 </select>
                 <div
                   class="flex items-center gap-2 text-blue-600 pointer-events-none z-10"
@@ -1001,6 +1002,15 @@
           } else if (selectedLangCode === "fr") {
             flagUrl = "https://flagicons.lipis.dev/flags/4x3/fr.svg";
             langName = "French";
+          } else if (selectedLangCode === "en") {
+            flagUrl = "https://flagicons.lipis.dev/flags/4x3/us.svg";
+            langName = "English";
+          } else if (selectedLangCode === "de") {
+            flagUrl = "https://flagicons.lipis.dev/flags/4x3/de.svg";
+            langName = "Germany";
+          } else if (selectedLangCode === "jp") {
+            flagUrl = "https://flagicons.lipis.dev/flags/4x3/jp.svg";
+            langName = "Japan";
           }
 
           practiceLangFlag.src = flagUrl;
@@ -1109,9 +1119,7 @@
 
             // Get target language and model ID
             const targetLang = practiceLangSelect.value;
-            const modelId =
-              document.getElementById("practice-model-select").value ||
-              localStorage.getItem("user_voice_model_id") ||
+            const modelId = localStorage.getItem("user_voice_model_id") ||
               "03397b4c4be74759b72533b663fbd001";
 
             formData.append("target_lang", targetLang);
@@ -1450,6 +1458,15 @@
           } else if (selectedLangCode === "fr") {
             flagUrl = "https://flagicons.lipis.dev/flags/4x3/fr.svg";
             langName = "French";
+          } else if (selectedLangCode === "en") {
+            flagUrl = "https://flagicons.lipis.dev/flags/4x3/us.svg";
+            langName = "English";
+          } else if (selectedLangCode === "de") {
+            flagUrl = "https://flagicons.lipis.dev/flags/4x3/de.svg";
+            langName = "Germany";
+          } else if (selectedLangCode === "jp") {
+            flagUrl = "https://flagicons.lipis.dev/flags/4x3/jp.svg";
+            langName = "Japan";
           }
 
           conversationLangFlag.src = flagUrl;
