@@ -1,1 +1,1 @@
-Can just run flask backend with `uvicorn main:app --reload`
+Can just run fast-api backend with `uvicorn main:app --reload`
